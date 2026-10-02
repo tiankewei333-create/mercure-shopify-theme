@@ -10,3 +10,6 @@ Thumbs.db
 .shopify
 node_modules
 *.zip
+.idea
+redirects.csv
+redirects-unmatched.csv

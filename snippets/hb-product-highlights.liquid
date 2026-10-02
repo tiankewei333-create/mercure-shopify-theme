@@ -1,0 +1,30 @@
+{%- comment -%}
+  Checklist of short selling points from product.metafields.custom.highlights (list of single-line text).
+  Renders nothing on the storefront when the metafield is empty; shows an editor-only hint in the theme editor.
+
+  Accepts:
+  - product: {Object}
+  - block: {Object}
+{%- endcomment -%}
+{%- assign highlights = product.metafields.custom.highlights.value -%}
+{%- capture items -%}
+  {%- for item in highlights -%}
+    {%- assign text = item | strip -%}
+    {%- if text != blank -%}
+      <li class="hb-highlights__item">
+        {%- render 'hb-icon', icon: 'check', class: 'hb-highlights__icon' -%}
+        <span>{{ text | escape }}</span>
+      </li>
+    {%- endif -%}
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- if items != blank -%}
+  <ul class="hb-highlights list-unstyled" aria-label="{{ 'hb.highlights.label' | t }}" {{ block.shopify_attributes }}>
+    {{- items -}}
+  </ul>
+{%- elsif request.design_mode -%}
+  <p class="hb-editor-hint" {{ block.shopify_attributes }}>
+    No highlights on this product. Add them in the product's <strong>Highlights</strong> metafield.
+  </p>
+{%- endif -%}

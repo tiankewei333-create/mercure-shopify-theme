@@ -1,9 +1,9 @@
 [
   {
     "name": "theme_info",
-    "theme_name": "Dawn",
-    "theme_version": "16.0.0",
-    "theme_author": "Shopify",
+    "theme_name": "Hearth & Brew",
+    "theme_version": "0.1.0",
+    "theme_author": "Hearth & Brew (based on Dawn 16.0.0 by Shopify)",
     "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
     "theme_support_url": "https://support.shopify.com/"
   },
@@ -1449,6 +1449,28 @@
         "id": "cart_color_scheme",
         "label": "t:sections.all.colors.label",
         "default": "scheme-1"
+      }
+    ]
+  },
+  {
+    "name": "Free shipping bar",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Shows progress toward free shipping in the cart drawer and on the cart page. Keep the threshold in sync with your shipping rates in Settings > Shipping and delivery."
+      },
+      {
+        "type": "checkbox",
+        "id": "hb_free_shipping_enabled",
+        "label": "Show free shipping bar",
+        "default": true
+      },
+      {
+        "type": "number",
+        "id": "hb_free_shipping_threshold",
+        "label": "Free shipping threshold",
+        "info": "In your store's default currency, without symbols. The bar is hidden for customers shopping in another currency so it never shows a wrong amount.",
+        "default": 75
       }
     ]
   },

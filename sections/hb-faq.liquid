@@ -1,0 +1,193 @@
+{%- comment -%}
+  FAQ as native <details> disclosures (keyboard and screen reader support for free, works without JS).
+  Questions come from two sources, shown in this order:
+  1. the `faqs` setting, a list of faq_item metaobjects (on product templates, connect it to
+     product.metafields.custom.faqs so each product carries its own questions)
+  2. question blocks added in the editor
+  Optionally emits FAQPage structured data built from the same content.
+{%- endcomment -%}
+{%- liquid
+  assign faq_entries = section.settings.faqs
+  assign schema_items = ''
+-%}
+
+{%- capture items -%}
+  {%- for faq in faq_entries -%}
+    {%- liquid
+      assign question = faq.question.value | strip
+      assign answer_text = faq.answer | metafield_text | strip
+    -%}
+    {%- if question == blank or answer_text == blank -%}{%- continue -%}{%- endif -%}
+    <details class="hb-faq__item">
+      <summary class="hb-faq__question">
+        <span>{{ question | escape }}</span>
+      </summary>
+      <div class="hb-faq__answer rte">{{ faq.answer | metafield_tag }}</div>
+    </details>
+    {%- capture schema_item -%}{"@type":"Question","name":{{ question | json }},"acceptedAnswer":{"@type":"Answer","text":{{ answer_text | json }}}}{%- endcapture -%}
+    {%- assign schema_items = schema_items | append: schema_item | append: ',' -%}
+  {%- endfor -%}
+
+  {%- for block in section.blocks -%}
+    {%- liquid
+      assign question = block.settings.question | strip
+      assign answer_text = block.settings.answer | strip_html | strip
+    -%}
+    {%- if question == blank or answer_text == blank -%}{%- continue -%}{%- endif -%}
+    <details class="hb-faq__item" {{ block.shopify_attributes }}>
+      <summary class="hb-faq__question">
+        <span>{{ question | escape }}</span>
+      </summary>
+      <div class="hb-faq__answer rte">{{ block.settings.answer }}</div>
+    </details>
+    {%- capture schema_item -%}{"@type":"Question","name":{{ question | json }},"acceptedAnswer":{"@type":"Answer","text":{{ answer_text | json }}}}{%- endcapture -%}
+    {%- assign schema_items = schema_items | append: schema_item | append: ',' -%}
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- if items != blank -%}
+  {{ 'section-hb-faq.css' | asset_url | stylesheet_tag }}
+  {%- render 'hb-section-padding', section: section -%}
+
+  <div class="color-{{ section.settings.color_scheme }} gradient">
+    <div class="hb-faq page-width section-{{ section.id }}-padding">
+      {%- if section.settings.heading != blank or section.settings.text != blank -%}
+        <div class="hb-section-header">
+          {%- if section.settings.heading != blank -%}
+            <h2 class="h2">{{ section.settings.heading | escape }}</h2>
+          {%- endif -%}
+          {%- if section.settings.text != blank -%}
+            <div class="hb-section-header__text rte">{{ section.settings.text }}</div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+      <div class="hb-faq__list">
+        {{- items -}}
+      </div>
+    </div>
+  </div>
+
+  {%- if section.settings.structured_data -%}
+    <script type="application/ld+json">
+      {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{{ schema_items | remove_last: ',' }}]}
+    </script>
+  {%- endif -%}
+{%- elsif request.design_mode -%}
+  <div class="page-width">
+    <p class="hb-editor-hint">
+      FAQ is hidden: add question blocks, or pick FAQ entries (on product templates, connect the setting to the
+      product's <strong>FAQs</strong> metafield).
+    </p>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "FAQ",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Questions, answered"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "metaobject_list",
+      "id": "faqs",
+      "metaobject_type": "faq_item",
+      "label": "FAQ entries",
+      "limit": 20,
+      "info": "Reusable questions from Content > Metaobjects. On product templates, connect to the product's \"FAQs\" metafield."
+    },
+    {
+      "type": "checkbox",
+      "id": "structured_data",
+      "label": "Add FAQ structured data for search engines",
+      "info": "Use on one FAQ section per page.",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 52
+    }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ",
+      "blocks": [
+        {
+          "type": "question",
+          "settings": {
+            "question": "How long does delivery take?",
+            "answer": "<p>Orders placed before 2 pm ship the same working day. Most arrive in 2 to 4 working days.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "question": "Can I return something I have used?",
+            "answer": "<p>Yes. Brew with it for up to 30 days and send it back in its box if it is not right for you.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "question": "What does the warranty cover?",
+            "answer": "<p>Two years on kettles and grinders, parts and labour, for manufacturing faults.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

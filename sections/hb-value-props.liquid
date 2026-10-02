@@ -1,0 +1,159 @@
+{%- comment -%}
+  Row of short reassurance points (icon, title, text). Blocks with neither title nor text are skipped,
+  and the whole section disappears on the storefront if every block is empty.
+{%- endcomment -%}
+{%- capture items -%}
+  {%- for block in section.blocks -%}
+    {%- if block.settings.title == blank and block.settings.text == blank -%}
+      {%- continue -%}
+    {%- endif -%}
+    <li class="hb-props__item" {{ block.shopify_attributes }}>
+      {%- render 'hb-icon', icon: block.settings.icon, class: 'hb-props__icon' -%}
+      <div class="hb-props__copy">
+        {%- if block.settings.title != blank -%}
+          <h3 class="hb-props__title h4">{{ block.settings.title | escape }}</h3>
+        {%- endif -%}
+        {%- if block.settings.text != blank -%}
+          <div class="hb-props__text rte">{{ block.settings.text }}</div>
+        {%- endif -%}
+      </div>
+    </li>
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- if items != blank -%}
+  {{ 'section-hb-value-props.css' | asset_url | stylesheet_tag }}
+  {%- render 'hb-section-padding', section: section -%}
+
+  <div class="color-{{ section.settings.color_scheme }} gradient">
+    <div class="page-width section-{{ section.id }}-padding">
+      {%- if section.settings.heading != blank -%}
+        <div class="hb-section-header hb-section-header--center">
+          <h2 class="h2">{{ section.settings.heading | escape }}</h2>
+        </div>
+      {%- endif -%}
+      <ul class="hb-props list-unstyled" role="list">
+        {{- items -}}
+      </ul>
+    </div>
+  </div>
+{%- elsif request.design_mode -%}
+  <div class="page-width">
+    <p class="hb-editor-hint">Value props are hidden: add a block with a title or text.</p>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Value props",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Optional."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Point",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "truck", "label": "Delivery" },
+            { "value": "return", "label": "Returns" },
+            { "value": "shield", "label": "Warranty" },
+            { "value": "bean", "label": "Coffee bean" },
+            { "value": "kettle", "label": "Kettle" },
+            { "value": "leaf", "label": "Sustainable" },
+            { "value": "chat", "label": "Support" },
+            { "value": "clock", "label": "Time" },
+            { "value": "star", "label": "Star" }
+          ],
+          "default": "truck"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Free shipping over $75"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Dispatched within one working day.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Value props",
+      "blocks": [
+        {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "title": "Free shipping over $75",
+            "text": "<p>Dispatched within one working day.</p>"
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "icon": "return",
+            "title": "30-day returns",
+            "text": "<p>Brew with it for a month. Send it back if it is not for you.</p>"
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "2-year warranty",
+            "text": "<p>Every kettle and grinder, parts and labour.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

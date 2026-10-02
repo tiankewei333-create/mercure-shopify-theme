@@ -1,0 +1,61 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "padding_top": 36,
+        "padding_bottom": 0
+      }
+    },
+    "faq": {
+      "type": "hb-faq",
+      "blocks": {
+        "delivery": {
+          "type": "question",
+          "settings": {
+            "question": "How long does delivery take?",
+            "answer": "<p>Orders placed before 2 pm ship the same working day. Most arrive in 2 to 4 working days.</p>"
+          }
+        },
+        "international": {
+          "type": "question",
+          "settings": {
+            "question": "Do you ship internationally?",
+            "answer": "<p>Yes, to the UK, EU, US, Canada and Australia. Duties are shown at checkout, never on delivery.</p>"
+          }
+        },
+        "returns": {
+          "type": "question",
+          "settings": {
+            "question": "Can I return something I have used?",
+            "answer": "<p>Yes. Brew with it for up to 30 days and send it back in its box if it is not right for you.</p>"
+          }
+        },
+        "warranty": {
+          "type": "question",
+          "settings": {
+            "question": "What does the warranty cover?",
+            "answer": "<p>Two years on kettles and grinders, parts and labour, for manufacturing faults.</p>"
+          }
+        },
+        "parts": {
+          "type": "question",
+          "settings": {
+            "question": "Can I buy spare parts?",
+            "answer": "<p>Lids, burrs, seals and filters are listed in the Spare parts collection. Write to us if you cannot find yours.</p>"
+          }
+        }
+      },
+      "block_order": ["delivery", "international", "returns", "warranty", "parts"],
+      "settings": {
+        "heading": "Orders, returns and care",
+        "text": "<p>Still stuck? <a href=\"/pages/contact\">Contact us</a> and a person will reply.</p>",
+        "structured_data": true,
+        "color_scheme": "scheme-1",
+        "padding_top": 36,
+        "padding_bottom": 56
+      }
+    }
+  },
+  "order": ["main", "faq"]
+}

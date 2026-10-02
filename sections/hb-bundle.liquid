@@ -1,0 +1,252 @@
+{%- comment -%}
+  "Complete the set": the current product plus add-ons, added to cart in one request
+  (Cart AJAX API, items[]) and painted into Dawn's drawer via the Section Rendering API.
+
+  Add-ons come from the `products` setting, which the product template connects to
+  product.metafields.custom.bundle_products. Renders nothing when no add-on is available.
+{%- endcomment -%}
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign include_current = section.settings.include_current
+  assign preselect = section.settings.preselect
+  assign available_add_ons = 0
+  assign total = 0
+
+  if include_current and current_variant.available
+    assign total = current_variant.price
+  endif
+-%}
+
+{%- capture add_on_items -%}
+  {%- for add_on in section.settings.products -%}
+    {%- if add_on.id == product.id or add_on.available == false -%}
+      {%- continue -%}
+    {%- endif -%}
+    {%- liquid
+      assign available_add_ons = available_add_ons | plus: 1
+      assign variant = add_on.selected_or_first_available_variant
+      if preselect
+        assign total = total | plus: variant.price
+      endif
+      assign input_id = 'Bundle-' | append: section.id | append: '-' | append: add_on.id
+    -%}
+    <li class="hb-bundle__item">
+      <input
+        class="hb-bundle__check"
+        type="checkbox"
+        id="{{ input_id }}"
+        value="{{ variant.id }}"
+        data-price="{{ variant.price }}"
+        {% if preselect %}
+          checked
+        {% endif %}
+      >
+      <label class="hb-bundle__media" for="{{ input_id }}">
+        <span class="visually-hidden">{{ 'hb.bundle.include' | t: title: add_on.title | escape }}</span>
+        {%- if add_on.featured_media -%}
+          {{-
+            add_on.featured_media
+            | image_url: width: 240
+            | image_tag: loading: 'lazy', widths: '120, 240', sizes: '12rem', alt: ''
+          -}}
+        {%- else -%}
+          {{- 'product-1' | placeholder_svg_tag: 'hb-placeholder' -}}
+        {%- endif -%}
+      </label>
+      <div class="hb-bundle__info">
+        <a class="hb-bundle__title" href="{{ add_on.url }}">{{ add_on.title | escape }}</a>
+        {%- if add_on.has_only_default_variant -%}
+          <span class="hb-bundle__price" data-hb-price>{{ variant.price | money }}</span>
+        {%- else -%}
+          <select class="hb-bundle__select select__select" data-hb-variant-select aria-label="{{ add_on.title | escape }}">
+            {%- for option_variant in add_on.variants -%}
+              <option
+                value="{{ option_variant.id }}"
+                data-price="{{ option_variant.price }}"
+                {% if option_variant.id == variant.id %}
+                  selected
+                {% endif %}
+                {% unless option_variant.available %}
+                  disabled
+                {% endunless %}
+              >
+                {{ option_variant.title | escape }} – {{ option_variant.price | money_without_trailing_zeros }}
+                {%- unless option_variant.available %} ({{ 'hb.bundle.sold_out' | t }}){% endunless -%}
+              </option>
+            {%- endfor -%}
+          </select>
+        {%- endif -%}
+      </div>
+    </li>
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- if available_add_ons > 0 -%}
+  {{ 'section-hb-bundle.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'hb-bundle.js' | asset_url }}" defer="defer"></script>
+  {%- render 'hb-section-padding', section: section -%}
+
+  <div class="color-{{ section.settings.color_scheme }} gradient">
+    <hb-bundle
+      class="hb-bundle page-width section-{{ section.id }}-padding"
+      data-msg-none="{{ 'hb.bundle.none_selected' | t | escape }}"
+      data-msg-error="{{ 'hb.bundle.error' | t | escape }}"
+      data-msg-added="{{ 'hb.bundle.added' | t | escape }}"
+      data-msg-adding="{{ 'hb.bundle.adding' | t | escape }}"
+      data-msg-sold-out="{{ 'hb.bundle.sold_out' | t | escape }}"
+    >
+      {%- if section.settings.heading != blank or section.settings.text != blank -%}
+        <div class="hb-section-header">
+          {%- if section.settings.heading != blank -%}
+            <h2 class="h2">{{ section.settings.heading | escape }}</h2>
+          {%- endif -%}
+          {%- if section.settings.text != blank -%}
+            <div class="hb-section-header__text rte">{{ section.settings.text }}</div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      <form class="hb-bundle__form" novalidate>
+        <ul class="hb-bundle__list list-unstyled" role="list">
+          {%- if include_current -%}
+            {%- assign current_id = 'Bundle-' | append: section.id | append: '-current' -%}
+            <li class="hb-bundle__item" data-hb-current data-variant-ids="{{ product.variants | map: 'id' | join: ',' }}">
+              <input
+                class="hb-bundle__check"
+                type="checkbox"
+                id="{{ current_id }}"
+                value="{{ current_variant.id }}"
+                data-price="{{ current_variant.price }}"
+                {% if current_variant.available %}
+                  checked
+                {% else %}
+                  disabled
+                {% endif %}
+              >
+              <label class="hb-bundle__media" for="{{ current_id }}">
+                <span class="visually-hidden">{{ 'hb.bundle.include' | t: title: product.title | escape }}</span>
+                {%- if product.featured_media -%}
+                  {{-
+                    product.featured_media
+                    | image_url: width: 240
+                    | image_tag: loading: 'lazy', widths: '120, 240', sizes: '12rem', alt: ''
+                  -}}
+                {%- else -%}
+                  {{- 'product-1' | placeholder_svg_tag: 'hb-placeholder' -}}
+                {%- endif -%}
+              </label>
+              <div class="hb-bundle__info">
+                <span class="hb-eyebrow">{{ 'hb.bundle.this_item' | t }}</span>
+                <span class="hb-bundle__title">{{ product.title | escape }}</span>
+                <span class="hb-bundle__price" data-hb-price>
+                  {%- if current_variant.available -%}
+                    {{ current_variant.price | money }}
+                  {%- else -%}
+                    {{ 'hb.bundle.sold_out' | t }}
+                  {%- endif -%}
+                </span>
+              </div>
+            </li>
+          {%- endif -%}
+          {{- add_on_items -}}
+        </ul>
+
+        <div class="hb-bundle__summary">
+          <p class="hb-bundle__total">
+            <span>{{ 'hb.bundle.total' | t }}</span>
+            <strong data-hb-total>{{ total | money }}</strong>
+          </p>
+          <button type="submit" class="button button--full-width" data-hb-submit>
+            {{ 'hb.bundle.add_selected' | t }}
+          </button>
+          <p class="hb-bundle__status" role="status" data-hb-status></p>
+        </div>
+      </form>
+    </hb-bundle>
+  </div>
+{%- elsif request.design_mode -%}
+  <div class="page-width">
+    <p class="hb-editor-hint">
+      "Complete the set" is hidden: this product has no available add-ons. Add products to its
+      <strong>Complete the set</strong> metafield.
+    </p>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Complete the set",
+  "tag": "section",
+  "class": "section",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Complete the set"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "Add-on products",
+      "limit": 4,
+      "info": "Connect to the product's \"Complete the set\" metafield so every product shows its own add-ons. Sold-out add-ons are hidden."
+    },
+    {
+      "type": "checkbox",
+      "id": "include_current",
+      "label": "Include the current product",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "preselect",
+      "label": "Pre-select add-ons",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "Complete the set"
+    }
+  ]
+}
+{% endschema %}

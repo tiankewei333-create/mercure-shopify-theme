@@ -1,0 +1,19 @@
+{
+  "name": "hearth-and-brew-theme",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Custom Online Store 2.0 theme for Hearth & Brew, built on Dawn",
+  "scripts": {
+    "dev": "shopify theme dev",
+    "check": "shopify theme check --fail-level error",
+    "push:unpublished": "shopify theme push --unpublished",
+    "redirects:woo": "node scripts/woo-redirects.mjs",
+    "setup:metafields": "node scripts/setup-metafields.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@shopify/cli": "^4.8.2"
+  }
+}

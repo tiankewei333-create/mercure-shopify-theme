@@ -1,0 +1,184 @@
+{%- comment -%}
+  About page story: intro copy beside an image, then a timeline of milestone blocks.
+  Falls back to the bundled workshop photo when no image is chosen. Milestones without a title are skipped.
+{%- endcomment -%}
+{{ 'section-hb-story.css' | asset_url | stylesheet_tag }}
+{%- render 'hb-section-padding', section: section -%}
+
+{%- capture milestones -%}
+  {%- for block in section.blocks -%}
+    {%- if block.settings.title == blank -%}{%- continue -%}{%- endif -%}
+    <li class="hb-story__milestone" {{ block.shopify_attributes }}>
+      {%- if block.settings.year != blank -%}
+        <p class="hb-story__year">{{ block.settings.year | escape }}</p>
+      {%- endif -%}
+      <h3 class="hb-story__title h4">{{ block.settings.title | escape }}</h3>
+      {%- if block.settings.text != blank -%}
+        <div class="hb-story__text rte">{{ block.settings.text }}</div>
+      {%- endif -%}
+    </li>
+  {%- endfor -%}
+{%- endcapture -%}
+
+<div class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="hb-story page-width section-{{ section.id }}-padding">
+    <div class="hb-story__intro">
+      <div class="hb-story__copy">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="hb-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="h1">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+        {%- if section.settings.text != blank -%}
+          <div class="hb-story__lede rte">{{ section.settings.text }}</div>
+        {%- endif -%}
+      </div>
+
+      <div class="hb-story__media">
+        {%- if section.settings.image != blank -%}
+          {{-
+            section.settings.image
+            | image_url: width: 1400
+            | image_tag:
+              loading: 'lazy',
+              widths: '400, 700, 1000, 1400',
+              sizes: '(min-width: 990px) 50vw, calc(100vw - 3rem)'
+          -}}
+        {%- else -%}
+          <img
+            src="{{ 'hb-story.jpg' | asset_url }}"
+            width="1024"
+            height="768"
+            loading="lazy"
+            alt="{{ 'hb.story.fallback_alt' | t | escape }}"
+          >
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if milestones != blank -%}
+      <ol class="hb-story__timeline list-unstyled" role="list" aria-label="{{ 'hb.story.timeline_label' | t }}">
+        {{- milestones -}}
+      </ol>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Brand story",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Our story"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "We started with one kettle that poured badly."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Hearth & Brew began at a kitchen table in 2018. Every product is sketched, prototyped and brewed with in our own workshop before it reaches yours.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "Leave empty to use the bundled workshop photo."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 56
+    }
+  ],
+  "blocks": [
+    {
+      "type": "milestone",
+      "name": "Milestone",
+      "settings": [
+        {
+          "type": "text",
+          "id": "year",
+          "label": "Year"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brand story",
+      "blocks": [
+        {
+          "type": "milestone",
+          "settings": {
+            "year": "2018",
+            "title": "A kitchen-table prototype",
+            "text": "<p>A gooseneck spout bent by hand, tested on a thousand mornings.</p>"
+          }
+        },
+        {
+          "type": "milestone",
+          "settings": {
+            "year": "2020",
+            "title": "Our first ceramic dripper",
+            "text": "<p>Thrown with a small studio in Stoke-on-Trent, still made there today.</p>"
+          }
+        },
+        {
+          "type": "milestone",
+          "settings": {
+            "year": "2024",
+            "title": "The workshop opens",
+            "text": "<p>Repairs, spare parts and brewing classes under one roof.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

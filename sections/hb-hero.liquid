@@ -1,0 +1,208 @@
+{%- comment -%}
+  Split hero: copy on one side, a tall image on the other (stacked on mobile, image first).
+  The image is the page's LCP element, so it loads eagerly with high fetch priority.
+  Without a chosen image it falls back to the theme's bundled photo, so the section never renders empty.
+{%- endcomment -%}
+{{ 'section-hb-hero.css' | asset_url | stylesheet_tag }}
+{%- render 'hb-section-padding', section: section -%}
+
+{%- liquid
+  assign image = section.settings.image
+  assign has_primary = false
+  if section.settings.button_label != blank and section.settings.button_link != blank
+    assign has_primary = true
+  endif
+  assign has_secondary = false
+  if section.settings.button_label_2 != blank and section.settings.button_link_2 != blank
+    assign has_secondary = true
+  endif
+-%}
+
+<div class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="hb-hero hb-hero--image-{{ section.settings.image_position }} page-width section-{{ section.id }}-padding">
+    <div class="hb-hero__media">
+      {%- if image != blank -%}
+        {{-
+          image
+          | image_url: width: 1600
+          | image_tag:
+            loading: 'eager',
+            fetchpriority: 'high',
+            widths: '375, 550, 750, 1100, 1400, 1600',
+            sizes: '(min-width: 990px) 50vw, calc(100vw - 3rem)',
+            class: 'hb-hero__image'
+        -}}
+      {%- else -%}
+        <img
+          class="hb-hero__image"
+          src="{{ 'hb-hero.jpg' | asset_url }}"
+          width="768"
+          height="1024"
+          alt="{{ 'hb.hero.fallback_alt' | t | escape }}"
+          fetchpriority="high"
+        >
+      {%- endif -%}
+    </div>
+
+    <div class="hb-hero__content">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="hb-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="hb-hero__heading {{ section.settings.heading_size }}">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="hb-hero__text rte">{{ section.settings.text }}</div>
+      {%- endif -%}
+
+      {%- if has_primary or has_secondary -%}
+        <div class="hb-hero__buttons">
+          {%- if has_primary -%}
+            <a class="button" href="{{ section.settings.button_link }}">{{ section.settings.button_label | escape }}</a>
+          {%- endif -%}
+          {%- if has_secondary -%}
+            <a class="button button--secondary" href="{{ section.settings.button_link_2 }}">
+              {{- section.settings.button_label_2 | escape -}}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.trust_text != blank -%}
+        <p class="hb-hero__trust">
+          {%- render 'hb-icon', icon: 'shield' -%}
+          <span>{{ section.settings.trust_text }}</span>
+        </p>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Hero",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "Portrait images work best (3:4). Leave empty to use the bundled brand photo."
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image position on desktop",
+      "options": [
+        { "value": "right", "label": "Right" },
+        { "value": "left", "label": "Left" }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "header",
+      "content": "Text"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Slow coffee, at home"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Tools for the ten quiet minutes before the day starts."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        { "value": "h1", "label": "Medium" },
+        { "value": "h0", "label": "Large" }
+      ],
+      "default": "h0"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Kettles, drippers and grinders designed in our workshop and tested on thousands of real brews.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Primary button label",
+      "default": "Shop brewers"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Primary button link"
+    },
+    {
+      "type": "text",
+      "id": "button_label_2",
+      "label": "Secondary button label",
+      "default": "Find your method"
+    },
+    {
+      "type": "url",
+      "id": "button_link_2",
+      "label": "Secondary button link"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "trust_text",
+      "label": "Reassurance line",
+      "info": "Short line under the buttons, e.g. shipping or returns.",
+      "default": "Free shipping over $75 · 30-day returns · 2-year warranty"
+    },
+    {
+      "type": "header",
+      "content": "Section"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 56
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero"
+    }
+  ]
+}
+{% endschema %}

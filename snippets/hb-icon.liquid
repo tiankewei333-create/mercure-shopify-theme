@@ -1,0 +1,55 @@
+{%- comment -%}
+  Decorative inline icons (always aria-hidden). Unknown names render nothing.
+
+  Accepts:
+  - icon: {String} truck | bean | leaf | shield | return | star | check | ruler | close | chat | clock | kettle | mail | phone | pin
+  - class: {String} optional extra class
+
+  Usage:
+  {% render 'hb-icon', icon: 'truck' %}
+{%- endcomment -%}
+{%- capture path -%}
+  {%- case icon -%}
+    {%- when 'truck' -%}
+      <path d="M3 6h11v9H3zM14 9h4l3 3v3h-7z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>
+    {%- when 'bean' -%}
+      <ellipse cx="12" cy="12" rx="6" ry="9" transform="rotate(35 12 12)"/><path d="M8.5 17.5c3-2 4-9 7-11"/>
+    {%- when 'leaf' -%}
+      <path d="M5 19C5 10 10 5 20 4c-1 10-6 15-15 15z"/><path d="M5 19l8-8"/>
+    {%- when 'shield' -%}
+      <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>
+    {%- when 'return' -%}
+      <path d="M4 10h11a5 5 0 010 10H9"/><path d="M8 6l-4 4 4 4"/>
+    {%- when 'star' -%}
+      <path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>
+    {%- when 'check' -%}
+      <path d="M5 12.5l4.5 4.5L19 7.5"/>
+    {%- when 'ruler' -%}
+      <path d="M3 16L16 3l5 5L8 21z"/><path d="M7 12l2 2M10 9l2 2M13 6l2 2"/>
+    {%- when 'close' -%}
+      <path d="M6 6l12 12M18 6L6 18"/>
+    {%- when 'chat' -%}
+      <path d="M4 5h16v11H9l-5 4z"/>
+    {%- when 'clock' -%}
+      <circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>
+    {%- when 'kettle' -%}
+      <path d="M6 10h10l-1 10H7z"/><path d="M16 12l4-4M8 10a3 3 0 016 0"/>
+  {%- endcase -%}
+{%- endcapture -%}
+{%- if path != blank -%}
+  <svg
+    class="hb-icon{% if class != blank %} {{ class }}{% endif %}"
+    aria-hidden="true"
+    focusable="false"
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    {{- path -}}
+  </svg>
+{%- endif -%}

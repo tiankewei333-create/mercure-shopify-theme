@@ -1,99 +1,115 @@
-# Dawn
+# Hearth & Brew theme
 
-[![Build status](https://github.com/shopify/dawn/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Shopify/dawn/actions/workflows/ci.yml?query=branch%3Amain)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?color=informational)](/.github/CONTRIBUTING.md)
+A custom Online Store 2.0 theme for Hearth & Brew, a small coffee-gear brand. It is a fork of
+[Dawn 16.0.0](https://github.com/Shopify/dawn) with a custom design layer, merchant-editable
+sections and a structured product data model built on metafields and metaobjects.
 
-[Getting started](#getting-started) |
-[Staying up to date with Dawn changes](#staying-up-to-date-with-dawn-changes) |
-[Developer tools](#developer-tools) |
-[Contributing](#contributing) |
-[Code of conduct](#code-of-conduct) |
-[Theme Store submission](#theme-store-submission) |
-[License](#license)
+Everything custom is prefixed `hb` so it stays easy to tell apart from Dawn when merging upstream
+changes.
 
-Dawn represents a HTML-first, JavaScript-only-as-needed approach to theme development. It's Shopify's first source available theme with performance, flexibility, and [Online Store 2.0 features](https://www.shopify.com/partners/blog/shopify-online-store) built-in and acts as a reference for building Shopify themes.
+## What's custom
 
-* **Web-native in its purest form:** Themes run on the [evergreen web](https://www.w3.org/2001/tag/doc/evergreen-web/). We leverage the latest web browsers to their fullest, while maintaining support for the older ones through progressive enhancement—not polyfills.
-* **Lean, fast, and reliable:** Functionality and design defaults to “no” until it meets this requirement. Code ships on quality. Themes must be built with purpose. They shouldn’t support each and every feature in Shopify.
-* **Server-rendered:** HTML must be rendered by Shopify servers using Liquid. Business logic and platform primitives such as translations and money formatting don’t belong on the client. Async and on-demand rendering of parts of the page is OK, but we do it sparingly as a progressive enhancement.
-* **Functional, not pixel-perfect:** The Web doesn’t require each page to be rendered pixel-perfect by each browser engine. Using semantic markup, progressive enhancement, and clever design, we ensure that themes remain functional regardless of the browser.
+### Sections
 
-You can find a more detailed version of our theme code principles in the [contribution guide](https://github.com/Shopify/dawn/blob/main/.github/CONTRIBUTING.md#theme-code-principles).
+All sections have clear labels, presets and color-scheme/padding settings, so they can be added
+and arranged from the theme editor on any page.
+
+| Section | Purpose |
+| --- | --- |
+| `hb-hero` | Split hero with eyebrow, two buttons and a trust line. Ships with a default image. |
+| `hb-value-props` | Up to four icon + text selling points. |
+| `hb-brew-guide` | Renders a `brew_guide` metaobject: dose, water, ratio (computed), temperature, grind, time and numbered steps. |
+| `hb-comparison` | Compares 2–4 products. Rows read product metafields (material, capacity, dishwasher safe, warranty or any `custom.*` key). |
+| `hb-bundle` | "Frequently bought together": checkbox list with a live total, adds all selected items in one Cart AJAX call and refreshes the cart drawer through the Section Rendering API. |
+| `hb-testimonials` | Review cards with star rating, verified badge and linked product. Swipeable on mobile. |
+| `hb-faq` | Accordion fed by `faq_item` metaobjects and/or blocks, with optional FAQPage JSON-LD. |
+| `hb-story` | Brand story with image and an ordered milestone timeline. |
+| `hb-contact-info` | Email, phone, hours and address with `mailto:`/`tel:` links. |
+
+### Product page blocks
+
+Added to Dawn's `main-product` section:
+
+- **Highlights** (`hb_highlights`) – short bullet list from `custom.highlights`.
+- **Spec sheet** (`hb_spec_sheet`) – table from a `spec_sheet` metaobject, opened in a native `<dialog>`.
+
+### Cart
+
+- Free-shipping progress bar in the cart drawer and cart page. Threshold is set in
+  **Theme settings > Free shipping bar**; it hides itself for other currencies.
+
+### Empty states
+
+No section renders an empty shell on the storefront. If its data is missing (no metaobject linked,
+fewer than two products to compare, all blocks blank), it outputs nothing for shoppers and shows a
+short hint only inside the theme editor (`request.design_mode`).
+
+## Data model
+
+`scripts/setup-metafields.mjs` creates these definitions (safe to re-run):
+
+**Metaobjects**
+
+- `spec_sheet` – rows of label/value pairs for the spec table
+- `brew_guide` – method, dose, water, temperature, grind, time, steps, image
+- `faq_item` – question and rich-text answer
+
+**Product metafields** (namespace `custom`)
+
+`highlights`, `spec_sheet`, `brew_guide`, `faqs`, `bundle_products`, `material`, `capacity_ml`,
+`dishwasher_safe`, `warranty_years`
+
+`templates/product.json` connects them as dynamic sources, e.g.
+`"{{ product.metafields.custom.brew_guide.value }}"`, so each product shows its own guide, FAQ and
+bundle without per-product templates.
+
+## Templates
+
+| Template | Content |
+| --- | --- |
+| `index.json` | Hero, value props, featured collection, brew guide, comparison, testimonials, FAQ |
+| `product.json` | Main product with highlights and spec sheet, bundle, brew guide, FAQ, related products |
+| `page.about.json` | Brand story and timeline, value props |
+| `page.faq.json` | Page content plus FAQ with structured data |
+| `page.contact.json` | Contact details plus Dawn's contact form |
 
 ## Getting started
-We recommend using Dawn as a starting point for theme development. [Learn more on Shopify.dev](https://shopify.dev/themes/getting-started/create).
 
-> If you're building a theme for the Shopify Theme Store, then you can use Dawn as a starting point. However, the theme that you submit needs to be [substantively different from Dawn](https://shopify.dev/themes/store/requirements#uniqueness) so that it provides added value for merchants. Learn about the [ways that you can use Dawn](https://shopify.dev/themes/tools/dawn#ways-to-use-dawn).
-
-Please note that the main branch may include code for features not yet released. The "stable" version of Dawn is available in the theme store.
-
-## Staying up to date with Dawn changes
-
-Say you're building a new theme off Dawn but you still want to be able to pull in the latest changes, you can add a remote `upstream` pointing to this Dawn repository.
-
-1. Navigate to your local theme folder.
-2. Verify the list of remotes and validate that you have both an `origin` and `upstream`:
-```sh
-git remote -v
-```
-3. If you don't see an `upstream`, you can add one that points to Shopify's Dawn repository:
-```sh
-git remote add upstream https://github.com/Shopify/dawn.git
-```
-4. Pull in the latest Dawn changes into your repository:
-```sh
-git fetch upstream
-git pull upstream main
-```
-
-## Developer tools
-
-There are a number of really useful tools that the Shopify Themes team uses during development. Dawn is already set up to work with these tools.
-
-### Shopify CLI
-
-[Shopify CLI](https://github.com/Shopify/shopify-cli) helps you build Shopify themes faster and is used to automate and enhance your local development workflow. It comes bundled with a suite of commands for developing Shopify themes—everything from working with themes on a Shopify store (e.g. creating, publishing, deleting themes) or launching a development server for local theme development.
-
-You can follow this [quick start guide for theme developers](https://shopify.dev/docs/themes/tools/cli) to get started.
-
-### Theme Check
-
-We recommend using [Theme Check](https://github.com/shopify/theme-check) as a way to validate and lint your Shopify themes.
-
-We've added Theme Check to Dawn's [list of VS Code extensions](/.vscode/extensions.json) so if you're using Visual Studio Code as your code editor of choice, you'll be prompted to install the [Theme Check VS Code](https://marketplace.visualstudio.com/items?itemName=Shopify.theme-check-vscode) extension upon opening VS Code after you've forked and cloned Dawn.
-
-You can also run it from a terminal with the following Shopify CLI command:
+Requires Node 20+ and a Shopify store (a free Partner development store works).
 
 ```bash
-shopify theme check
+npm install
+npx shopify auth login
+
+# Create metafield and metaobject definitions
+# (custom app token with write_metaobject_definitions and write_products)
+SHOPIFY_STORE=your-store.myshopify.com SHOPIFY_ADMIN_TOKEN=shpat_xxx npm run setup:metafields
+
+npm run dev -- --store your-store       # local preview with hot reload
+npm run check                           # Theme Check, fails on errors
+npm run push:unpublished -- --store your-store
 ```
 
-### Continuous Integration
+On Windows PowerShell set the variables with `$env:SHOPIFY_STORE="..."` before running the script.
 
-Dawn uses [GitHub Actions](https://github.com/features/actions) to maintain the quality of the theme. [This is a starting point](https://github.com/Shopify/dawn/blob/main/.github/workflows/ci.yml) and what we suggest to use in order to ensure you're building better themes. Feel free to build off of it!
+## Migrating from WooCommerce
 
-#### Shopify/lighthouse-ci-action
+`scripts/woo-redirects.mjs` turns the old site's URLs into a Shopify redirect import file so search
+rankings and old links survive the move.
 
-We love fast websites! Which is why we created [Shopify/lighthouse-ci-action](https://github.com/Shopify/lighthouse-ci-action). This runs a series of [Google Lighthouse](https://developers.google.com/web/tools/lighthouse) audits for the home, product and collections pages on a store to ensure code that gets added doesn't degrade storefront performance over time.
+```bash
+npm run redirects:woo -- --urls product-sitemap.xml --urls old-urls.txt \
+  --products products_export.csv --blog news --out redirects.csv
+```
 
-#### Shopify/theme-check-action
+- `--urls` accepts sitemap XML or a plain list, and can be repeated.
+- `--products` (the Shopify products export) makes sure product redirects only point at handles
+  that exist.
+- Product, category, tag, blog post, shop, cart and account URLs are mapped automatically. Archive
+  pages, missing products and unknown patterns go to `redirects-unmatched.csv` for a manual decision.
 
-Dawn runs [Theme Check](#Theme-Check) on every commit via [Shopify/theme-check-action](https://github.com/Shopify/theme-check-action).
-
-## Contributing
-
-Want to make commerce better for everyone by contributing to Dawn? We'd love your help! Please read our [contributing guide](https://github.com/Shopify/dawn/blob/main/.github/CONTRIBUTING.md) to learn about our development process, how to propose bug fixes and improvements, and how to build for Dawn.
-
-## Code of conduct
-
-All developers who wish to contribute through code or issues, please first read our [Code of Conduct](https://github.com/Shopify/dawn/blob/main/.github/CODE_OF_CONDUCT.md).
-
-## Theme Store submission
-
-The [Shopify Theme Store](https://themes.shopify.com/) is the place where Shopify merchants find the themes that they'll use to showcase and support their business. As a theme partner, you can create themes for the Shopify Theme Store and reach an international audience of an ever-growing number of entrepreneurs.
-
-Ensure that you follow the list of [theme store requirements](https://shopify.dev/themes/store/requirements) if you're interested in becoming a [Shopify Theme Partner](https://themes.shopify.com/services/themes/guidelines) and building themes for the Shopify platform.
+Import `redirects.csv` under **Online Store > Navigation > URL redirects > Import**.
 
 ## License
 
-Copyright (c) 2021-present Shopify Inc. See [LICENSE](/LICENSE.md) for further details.
+Based on Dawn, copyright (c) 2021-present Shopify Inc. See [LICENSE](/LICENSE.md).

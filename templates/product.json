@@ -16,11 +16,21 @@
         "price": {
           "type": "price"
         },
+        "highlights": {
+          "type": "hb_highlights"
+        },
         "variant_picker": {
           "type": "variant_picker",
           "settings": {
             "picker_type": "button",
             "swatch_shape": "circle"
+          }
+        },
+        "spec_sheet": {
+          "type": "hb_spec_sheet",
+          "settings": {
+            "sheet": "{{ product.metafields.custom.spec_sheet.value }}",
+            "button_label": "Sizes & specifications"
           }
         },
         "quantity_selector": {
@@ -47,7 +57,9 @@
         "vendor",
         "title",
         "price",
+        "highlights",
         "variant_picker",
+        "spec_sheet",
         "quantity_selector",
         "buy_buttons",
         "description",
@@ -67,6 +79,43 @@
         "enable_video_looping": false,
         "padding_top": 36,
         "padding_bottom": 12
+      }
+    },
+    "bundle": {
+      "type": "hb-bundle",
+      "settings": {
+        "heading": "Complete the set",
+        "text": "<p>Everything this needs, added in one go.</p>",
+        "products": "{{ product.metafields.custom.bundle_products.value }}",
+        "include_current": true,
+        "preselect": true,
+        "color_scheme": "scheme-2",
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
+    },
+    "brew_guide": {
+      "type": "hb-brew-guide",
+      "settings": {
+        "guide": "{{ product.metafields.custom.brew_guide.value }}",
+        "eyebrow": "Brew guide",
+        "heading": "How we brew it",
+        "show_image": true,
+        "color_scheme": "scheme-1",
+        "padding_top": 52,
+        "padding_bottom": 36
+      }
+    },
+    "faq": {
+      "type": "hb-faq",
+      "settings": {
+        "heading": "About this product",
+        "text": "",
+        "faqs": "{{ product.metafields.custom.faqs.value }}",
+        "structured_data": true,
+        "color_scheme": "scheme-1",
+        "padding_top": 36,
+        "padding_bottom": 36
       }
     },
     "disclosures": {
@@ -97,6 +146,9 @@
   },
   "order": [
     "main",
+    "bundle",
+    "brew_guide",
+    "faq",
     "disclosures",
     "related-products"
   ]

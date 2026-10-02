@@ -1,0 +1,235 @@
+{%- comment -%}
+  Side-by-side comparison of up to 4 products. Each row block reads one product metafield
+  (namespace `custom`), so the table updates when product data changes, with no copy to keep in sync.
+  Missing values render an explicit "not specified" cell; booleans render Yes / No.
+  Hidden without at least two products and one row.
+{%- endcomment -%}
+{%- liquid
+  assign products = section.settings.products
+  assign row_blocks = section.blocks | where: 'type', 'row'
+
+  assign has_rows = false
+  if row_blocks.size > 0 or section.settings.show_price
+    assign has_rows = true
+  endif
+
+  assign show_table = false
+  if products.size >= 2 and has_rows
+    assign show_table = true
+  endif
+-%}
+
+{%- if show_table -%}
+  {{ 'section-hb-comparison.css' | asset_url | stylesheet_tag }}
+  {%- render 'hb-section-padding', section: section -%}
+  {%- assign title_id = 'Compare-' | append: section.id -%}
+
+  <div class="color-{{ section.settings.color_scheme }} gradient">
+    <div class="page-width section-{{ section.id }}-padding">
+      <div class="hb-section-header">
+        <h2 id="{{ title_id }}" class="h2">{{ section.settings.heading | escape }}</h2>
+        {%- if section.settings.text != blank -%}
+          <div class="hb-section-header__text rte">{{ section.settings.text }}</div>
+        {%- endif -%}
+      </div>
+
+      <div class="hb-table-scroll" role="region" aria-labelledby="{{ title_id }}" tabindex="0">
+        <table class="hb-table hb-compare">
+          <thead>
+            <tr>
+              <th scope="col" class="hb-compare__corner">{{ 'hb.compare.feature' | t }}</th>
+              {%- for product in products -%}
+                <th scope="col" class="hb-compare__product">
+                  <a href="{{ product.url }}" class="hb-compare__link">
+                    {%- if product.featured_media -%}
+                      {{-
+                        product.featured_media
+                        | image_url: width: 240
+                        | image_tag: loading: 'lazy', widths: '120, 240', sizes: '12rem', alt: '', class: 'hb-compare__image'
+                      -}}
+                    {%- endif -%}
+                    <span>{{ product.title | escape }}</span>
+                  </a>
+                </th>
+              {%- endfor -%}
+            </tr>
+          </thead>
+          <tbody>
+            {%- if section.settings.show_price -%}
+              <tr>
+                <th scope="row">{{ 'hb.compare.price' | t }}</th>
+                {%- for product in products -%}
+                  <td>
+                    {%- if product.price_varies -%}
+                      {%- assign min_price = product.price_min | money -%}
+                      {{ 'products.product.price.from_price_html' | t: price: min_price }}
+                    {%- else -%}
+                      {{ product.price | money }}
+                    {%- endif -%}
+                  </td>
+                {%- endfor -%}
+              </tr>
+            {%- endif -%}
+
+            {%- for block in row_blocks -%}
+              {%- liquid
+                assign key = block.settings.metafield
+                if key == 'custom_key'
+                  assign key = block.settings.custom_key | strip
+                endif
+                assign label = block.settings.label | default: key
+              -%}
+              {%- if key == blank -%}{%- continue -%}{%- endif -%}
+              <tr {{ block.shopify_attributes }}>
+                <th scope="row">{{ label | escape }}</th>
+                {%- for product in products -%}
+                  {%- liquid
+                    assign field = product.metafields.custom[key]
+                    assign is_empty = false
+                    if field == blank
+                      assign is_empty = true
+                    elsif field.type != 'boolean' and field.value == blank
+                      assign is_empty = true
+                    endif
+                  -%}
+                  <td>
+                    {%- if is_empty -%}
+                      <span aria-hidden="true">—</span>
+                      <span class="visually-hidden">{{ 'hb.compare.not_specified' | t }}</span>
+                    {%- elsif field.type == 'boolean' -%}
+                      {%- if field.value -%}
+                        {%- render 'hb-icon', icon: 'check', class: 'hb-compare__yes' -%}
+                        {{ 'hb.compare.yes' | t }}
+                      {%- else -%}
+                        {{ 'hb.compare.no' | t }}
+                      {%- endif -%}
+                    {%- else -%}
+                      {{ field.value | escape }}{{ block.settings.suffix | escape }}
+                    {%- endif -%}
+                  </td>
+                {%- endfor -%}
+              </tr>
+            {%- endfor -%}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{%- elsif request.design_mode -%}
+  <div class="page-width">
+    <p class="hb-editor-hint">Comparison is hidden: choose at least two products and add a row.</p>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Product comparison",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Which kettle is yours?"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "Products",
+      "limit": 4,
+      "info": "Two to four products. Values come from each product's metafields."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show price row",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 52
+    }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Row label",
+          "default": "Material"
+        },
+        {
+          "type": "select",
+          "id": "metafield",
+          "label": "Value",
+          "options": [
+            { "value": "material", "label": "Material" },
+            { "value": "capacity_ml", "label": "Capacity (ml)" },
+            { "value": "dishwasher_safe", "label": "Dishwasher safe" },
+            { "value": "warranty_years", "label": "Warranty (years)" },
+            { "value": "custom_key", "label": "Other metafield" }
+          ],
+          "default": "material"
+        },
+        {
+          "type": "text",
+          "id": "custom_key",
+          "label": "Other metafield key",
+          "info": "Only used with \"Other metafield\". Key in the custom namespace, e.g. power_watts."
+        },
+        {
+          "type": "text",
+          "id": "suffix",
+          "label": "Unit after the value",
+          "info": "Include a leading space if needed, e.g. \" ml\"."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product comparison",
+      "blocks": [
+        { "type": "row", "settings": { "label": "Material", "metafield": "material" } },
+        { "type": "row", "settings": { "label": "Capacity", "metafield": "capacity_ml", "suffix": " ml" } },
+        { "type": "row", "settings": { "label": "Dishwasher safe", "metafield": "dishwasher_safe" } },
+        { "type": "row", "settings": { "label": "Warranty", "metafield": "warranty_years", "suffix": " years" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

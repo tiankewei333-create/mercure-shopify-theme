@@ -15,6 +15,7 @@
   {{ 'component-slider.css' | asset_url | stylesheet_tag }}
   {{ 'component-rating.css' | asset_url | stylesheet_tag }}
   {{ 'component-deferred-media.css' | asset_url | stylesheet_tag }}
+  {{ 'component-hb-product.css' | asset_url | stylesheet_tag }}
 
   {% unless product.has_only_default_variant %}
     {{ 'component-product-variant-picker.css' | asset_url | stylesheet_tag }}
@@ -688,6 +689,10 @@
                   </product-recommendations>
                 {%- when 'icon-with-text' -%}
                   {% render 'icon-with-text', block: block %}
+                {%- when 'hb_highlights' -%}
+                  {% render 'hb-product-highlights', product: product, block: block %}
+                {%- when 'hb_spec_sheet' -%}
+                  {% render 'hb-spec-sheet', block: block %}
               {%- endcase -%}
             {%- endfor -%}
             <a href="{{ product.url }}" class="link product__view-details animate-arrow">
@@ -761,6 +766,37 @@
   "blocks": [
     {
       "type": "@app"
+    },
+    {
+      "type": "hb_highlights",
+      "name": "Highlights",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Shows the product's Highlights metafield as a checklist. Hidden when the product has none."
+        }
+      ]
+    },
+    {
+      "type": "hb_spec_sheet",
+      "name": "Spec sheet",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "metaobject",
+          "id": "sheet",
+          "metaobject_type": "spec_sheet",
+          "label": "Spec sheet",
+          "info": "Connect to the product's Spec sheet metafield so each product shows its own table. Hidden when empty."
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Sizes & specifications"
+        }
+      ]
     },
     {
       "type": "text",

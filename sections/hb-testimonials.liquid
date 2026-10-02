@@ -1,0 +1,190 @@
+{%- comment -%}
+  Customer quotes with star rating, name, optional "verified buyer" tag and a link to the product reviewed.
+  Swipeable row on mobile (CSS scroll snap, no JS), grid on desktop. Blocks without a quote are skipped.
+{%- endcomment -%}
+{%- capture cards -%}
+  {%- for block in section.blocks -%}
+    {%- if block.settings.quote == blank -%}{%- continue -%}{%- endif -%}
+    {%- assign rating = block.settings.rating | default: 5 -%}
+    <li class="hb-reviews__item" {{ block.shopify_attributes }}>
+      <figure class="hb-reviews__card">
+        <div class="hb-reviews__stars" role="img" aria-label="{{ 'hb.testimonials.rating' | t: rating: rating }}">
+          {%- for i in (1..5) -%}
+            {%- if i <= rating -%}
+              {%- render 'hb-icon', icon: 'star', class: 'hb-reviews__star hb-reviews__star--on' -%}
+            {%- else -%}
+              {%- render 'hb-icon', icon: 'star', class: 'hb-reviews__star' -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+        <blockquote class="hb-reviews__quote">
+          <p>{{ block.settings.quote | escape | newline_to_br }}</p>
+        </blockquote>
+        <figcaption class="hb-reviews__meta">
+          {%- if block.settings.author != blank -%}
+            <span class="hb-reviews__author">{{ block.settings.author | escape }}</span>
+          {%- endif -%}
+          {%- if block.settings.verified -%}
+            <span class="hb-reviews__verified">
+              {%- render 'hb-icon', icon: 'check' -%}
+              {{ 'hb.testimonials.verified' | t }}
+            </span>
+          {%- endif -%}
+          {%- assign reviewed = block.settings.product -%}
+          {%- if reviewed != blank -%}
+            <a class="hb-reviews__product" href="{{ reviewed.url }}">{{ reviewed.title | escape }}</a>
+          {%- endif -%}
+        </figcaption>
+      </figure>
+    </li>
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- if cards != blank -%}
+  {{ 'section-hb-testimonials.css' | asset_url | stylesheet_tag }}
+  {%- render 'hb-section-padding', section: section -%}
+
+  <div class="color-{{ section.settings.color_scheme }} gradient">
+    <div class="page-width section-{{ section.id }}-padding">
+      {%- if section.settings.heading != blank or section.settings.text != blank -%}
+        <div class="hb-section-header">
+          {%- if section.settings.heading != blank -%}
+            <h2 class="h2">{{ section.settings.heading | escape }}</h2>
+          {%- endif -%}
+          {%- if section.settings.text != blank -%}
+            <div class="hb-section-header__text rte">{{ section.settings.text }}</div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+      <ul class="hb-reviews list-unstyled" role="list">
+        {{- cards -}}
+      </ul>
+    </div>
+  </div>
+{%- elsif request.design_mode -%}
+  <div class="page-width">
+    <p class="hb-editor-hint">Testimonials are hidden: add a review block with a quote.</p>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "max_blocks": 9,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "From people who brew every morning"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 52
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote"
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Name",
+          "info": "First name and initial is enough."
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Rating",
+          "default": 5
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Verified buyer",
+          "default": true
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product reviewed",
+          "info": "Optional. Shows a link under the name."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials",
+      "blocks": [
+        {
+          "type": "review",
+          "settings": {
+            "quote": "The pour is finally steady. My V60 tastes the same every day now, which it never did with the old kettle.",
+            "author": "Maya R.",
+            "rating": 5
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "quote": "Grind is even down to espresso fine and it fits in the drawer. Should have bought it years ago.",
+            "author": "Tom H.",
+            "rating": 5
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "quote": "Lovely dripper. Took a week to dial in my recipe, the brew guide on the page helped a lot.",
+            "author": "Ines G.",
+            "rating": 4
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -7,10 +7,23 @@
         "padding_bottom": 36
       }
     },
+    "details": {
+      "type": "hb-contact-info",
+      "settings": {
+        "heading": "Talk to a person",
+        "email": "hello@hearthandbrew.example",
+        "phone": "",
+        "hours": "Monday to Friday, 9:00 to 17:00\nReplies within one working day",
+        "address": "",
+        "color_scheme": "scheme-2",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
     "form": {
       "type": "contact-form",
       "settings": {
-        "heading": "",
+        "heading": "Or send a message",
         "heading_size": "h1",
         "color_scheme": "scheme-1",
         "padding_top": 36,
@@ -18,8 +31,5 @@
       }
     }
   },
-  "order": [
-    "main",
-    "form"
-  ]
+  "order": ["main", "details", "form"]
 }

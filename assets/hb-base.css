@@ -1,0 +1,174 @@
+/*
+  Hearth & Brew global layer. Loaded after Dawn's base.css.
+  Section-specific styles live in section-hb-*.css and are scoped to the section's root class.
+*/
+
+:root {
+  --hb-radius: 0.8rem;
+  --hb-radius-lg: 1.6rem;
+  --hb-space-2xs: 0.4rem;
+  --hb-space-xs: 0.8rem;
+  --hb-space-sm: 1.2rem;
+  --hb-space-md: 2rem;
+  --hb-space-lg: 3.2rem;
+  --hb-space-xl: 5.6rem;
+  --hb-border: 0.1rem solid rgba(var(--color-foreground), 0.12);
+  --hb-muted: rgba(var(--color-foreground), 0.72);
+}
+
+/* One visible, high-contrast focus ring everywhere, keyboard only. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 0.2rem solid rgb(var(--color-foreground));
+  outline-offset: 0.3rem;
+  box-shadow: 0 0 0 0.5rem rgb(var(--color-background));
+}
+
+.hb-section-header {
+  display: grid;
+  gap: var(--hb-space-xs);
+  margin-bottom: var(--hb-space-lg);
+  max-width: 64rem;
+}
+
+.hb-section-header--center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.hb-section-header > * {
+  margin: 0;
+}
+
+.hb-eyebrow {
+  font-size: 1.2rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hb-muted);
+}
+
+.hb-section-header__text {
+  color: var(--hb-muted);
+}
+
+.hb-section-header__text > :first-child {
+  margin-top: 0;
+}
+
+.hb-section-header__text > :last-child {
+  margin-bottom: 0;
+}
+
+/* Free shipping bar: rendered in the cart drawer on every page, so it lives in the global layer. */
+.hb-shipping-bar {
+  display: grid;
+  gap: var(--hb-space-xs);
+  padding: var(--hb-space-sm) 0;
+}
+
+.hb-shipping-bar__text {
+  display: flex;
+  gap: var(--hb-space-xs);
+  align-items: center;
+  margin: 0;
+  font-size: 1.4rem;
+  line-height: 1.4;
+}
+
+.hb-shipping-bar__text .hb-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.hb-shipping-bar__track {
+  height: 0.6rem;
+  overflow: hidden;
+  border-radius: 99rem;
+  background: rgba(var(--color-foreground), 0.12);
+}
+
+.hb-shipping-bar__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: rgb(var(--color-button));
+  transition: width 0.4s ease;
+}
+
+.hb-shipping-bar--done .hb-shipping-bar__fill {
+  background: #2e7d4f;
+}
+
+.cart-drawer .hb-shipping-bar {
+  padding-top: 0;
+}
+
+.cart__footer .hb-shipping-bar {
+  margin-bottom: var(--hb-space-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-shipping-bar__fill {
+    transition: none;
+  }
+}
+
+/* Data table shared by the spec sheet dialog and the comparison section. */
+.hb-table-scroll {
+  overflow-x: auto;
+  border: var(--hb-border);
+  border-radius: var(--hb-radius);
+}
+
+.hb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.4rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.hb-table th,
+.hb-table td {
+  padding: 1.2rem 1.4rem;
+  border-bottom: var(--hb-border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.hb-table thead th {
+  background: rgba(var(--color-foreground), 0.04);
+  font-weight: 600;
+}
+
+.hb-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.hb-table tbody th {
+  font-weight: 600;
+}
+
+/* Theme-editor-only hint shown in place of a section or block whose data is missing. */
+.hb-editor-hint {
+  margin: var(--hb-space-sm) 0;
+  padding: var(--hb-space-sm);
+  border: 0.1rem dashed rgba(var(--color-foreground), 0.35);
+  border-radius: var(--hb-radius);
+  font-size: 1.3rem;
+  color: var(--hb-muted);
+}
+
+.hb-placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(var(--color-foreground), 0.06);
+  fill: rgba(var(--color-foreground), 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-motion-safe {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}

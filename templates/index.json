@@ -1,75 +1,226 @@
 {
   "sections": {
-    "image_banner": {
-      "type": "image-banner",
+    "hero": {
+      "type": "hb-hero",
+      "settings": {
+        "image_position": "right",
+        "eyebrow": "Slow coffee, at home",
+        "heading": "Tools for the ten quiet minutes before the day starts.",
+        "heading_size": "h0",
+        "text": "<p>Kettles, drippers and grinders designed in our workshop and tested on thousands of real brews.</p>",
+        "button_label": "Shop brewers",
+        "button_link": "/collections/all",
+        "button_label_2": "Our story",
+        "button_link_2": "/pages/about",
+        "trust_text": "Free shipping over $75 · 30-day returns · 2-year warranty",
+        "color_scheme": "scheme-1",
+        "padding_top": 40,
+        "padding_bottom": 56
+      }
+    },
+    "value_props": {
+      "type": "hb-value-props",
       "blocks": {
-        "heading": {
-          "type": "heading",
+        "shipping": {
+          "type": "item",
           "settings": {
-            "heading": "Browse our latest products",
-            "heading_size": "h0"
+            "icon": "truck",
+            "title": "Free shipping over $75",
+            "text": "<p>Dispatched within one working day.</p>"
           }
         },
-        "button": {
-          "type": "buttons",
+        "returns": {
+          "type": "item",
           "settings": {
-            "button_label_1": "Shop all",
-            "button_link_1": "shopify://collections/all",
-            "button_style_secondary_1": true,
-            "button_label_2": "",
-            "button_link_2": "",
-            "button_style_secondary_2": false
+            "icon": "return",
+            "title": "30-day returns",
+            "text": "<p>Brew with it for a month. Send it back if it is not for you.</p>"
+          }
+        },
+        "warranty": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "2-year warranty",
+            "text": "<p>Every kettle and grinder, parts and labour.</p>"
+          }
+        },
+        "support": {
+          "type": "item",
+          "settings": {
+            "icon": "chat",
+            "title": "Brewing help",
+            "text": "<p>Real people reply to every email, usually the same day.</p>"
           }
         }
       },
-      "block_order": [
-        "heading",
-        "button"
-      ],
+      "block_order": ["shipping", "returns", "warranty", "support"],
       "settings": {
-        "image_overlay_opacity": 40,
-        "image_height": "large",
-        "desktop_content_position": "bottom-center",
-        "show_text_box": false,
-        "image_behavior": "none",
-        "desktop_content_alignment": "center",
-        "color_scheme": "scheme-3",
-        "mobile_content_alignment": "center",
-        "stack_images_on_mobile": false,
-        "show_text_below": false
+        "heading": "",
+        "color_scheme": "scheme-2",
+        "padding_top": 36,
+        "padding_bottom": 36
       }
     },
     "featured_collection": {
       "type": "featured-collection",
       "settings": {
-        "title": "Featured products",
-        "heading_size": "h2",
+        "title": "Start with the essentials",
+        "heading_size": "h1",
         "description": "",
         "show_description": false,
         "description_style": "body",
         "collection": "all",
-        "products_to_show": 8,
+        "products_to_show": 4,
         "columns_desktop": 4,
         "color_scheme": "scheme-1",
         "full_width": false,
         "show_view_all": true,
-        "view_all_style": "solid",
+        "view_all_style": "link",
         "enable_desktop_slider": false,
-        "swipe_on_mobile": false,
-        "image_ratio": "adapt",
+        "swipe_on_mobile": true,
+        "image_ratio": "portrait",
         "image_shape": "default",
         "show_secondary_image": true,
         "show_vendor": false,
         "show_rating": false,
-        "quick_add": "none",
+        "quick_add": "standard",
         "columns_mobile": "2",
-        "padding_top": 44,
+        "padding_top": 56,
         "padding_bottom": 36
+      }
+    },
+    "brew_guide": {
+      "type": "hb-brew-guide",
+      "settings": {
+        "eyebrow": "Brew guide",
+        "heading": "How we brew it",
+        "show_image": true,
+        "color_scheme": "scheme-2",
+        "padding_top": 52,
+        "padding_bottom": 52
+      }
+    },
+    "comparison": {
+      "type": "hb-comparison",
+      "blocks": {
+        "material": {
+          "type": "row",
+          "settings": { "label": "Material", "metafield": "material", "custom_key": "", "suffix": "" }
+        },
+        "capacity": {
+          "type": "row",
+          "settings": { "label": "Capacity", "metafield": "capacity_ml", "custom_key": "", "suffix": " ml" }
+        },
+        "dishwasher": {
+          "type": "row",
+          "settings": { "label": "Dishwasher safe", "metafield": "dishwasher_safe", "custom_key": "", "suffix": "" }
+        },
+        "warranty": {
+          "type": "row",
+          "settings": { "label": "Warranty", "metafield": "warranty_years", "custom_key": "", "suffix": " years" }
+        }
+      },
+      "block_order": ["material", "capacity", "dishwasher", "warranty"],
+      "settings": {
+        "heading": "Which kettle is yours?",
+        "text": "<p>Same pour control, different capacities. Pick the one that matches how many cups you make.</p>",
+        "show_price": true,
+        "color_scheme": "scheme-1",
+        "padding_top": 52,
+        "padding_bottom": 52
+      }
+    },
+    "testimonials": {
+      "type": "hb-testimonials",
+      "blocks": {
+        "review_1": {
+          "type": "review",
+          "settings": {
+            "quote": "The pour is finally steady. My V60 tastes the same every day now, which it never did with the old kettle.",
+            "author": "Maya R.",
+            "rating": 5,
+            "verified": true
+          }
+        },
+        "review_2": {
+          "type": "review",
+          "settings": {
+            "quote": "Grind is even down to espresso fine and it fits in the drawer. Should have bought it years ago.",
+            "author": "Tom H.",
+            "rating": 5,
+            "verified": true
+          }
+        },
+        "review_3": {
+          "type": "review",
+          "settings": {
+            "quote": "Lovely dripper. Took a week to dial in my recipe, the brew guide on the page helped a lot.",
+            "author": "Ines G.",
+            "rating": 4,
+            "verified": true
+          }
+        }
+      },
+      "block_order": ["review_1", "review_2", "review_3"],
+      "settings": {
+        "heading": "From people who brew every morning",
+        "text": "",
+        "color_scheme": "scheme-1",
+        "padding_top": 36,
+        "padding_bottom": 52
+      }
+    },
+    "faq": {
+      "type": "hb-faq",
+      "blocks": {
+        "delivery": {
+          "type": "question",
+          "settings": {
+            "question": "How long does delivery take?",
+            "answer": "<p>Orders placed before 2 pm ship the same working day. Most arrive in 2 to 4 working days.</p>"
+          }
+        },
+        "returns": {
+          "type": "question",
+          "settings": {
+            "question": "Can I return something I have used?",
+            "answer": "<p>Yes. Brew with it for up to 30 days and send it back in its box if it is not right for you.</p>"
+          }
+        },
+        "warranty": {
+          "type": "question",
+          "settings": {
+            "question": "What does the warranty cover?",
+            "answer": "<p>Two years on kettles and grinders, parts and labour, for manufacturing faults.</p>"
+          }
+        },
+        "beginner": {
+          "type": "question",
+          "settings": {
+            "question": "I am new to pour-over. Where do I start?",
+            "answer": "<p>A dripper, filters and a scale are enough. Every product page has a brew guide with the exact recipe we use.</p>"
+          }
+        }
+      },
+      "block_order": ["delivery", "returns", "warranty", "beginner"],
+      "settings": {
+        "heading": "Questions, answered",
+        "text": "<p>Anything else? <a href=\"/pages/contact\">Write to us</a>.</p>",
+        "structured_data": true,
+        "color_scheme": "scheme-2",
+        "padding_top": 52,
+        "padding_bottom": 52
       }
     }
   },
   "order": [
-    "image_banner",
-    "featured_collection"
+    "hero",
+    "value_props",
+    "featured_collection",
+    "brew_guide",
+    "comparison",
+    "testimonials",
+    "faq"
   ]
 }

@@ -1,0 +1,61 @@
+.hb-compare {
+  min-width: 56rem;
+  table-layout: fixed;
+}
+
+.hb-compare th,
+.hb-compare td {
+  white-space: normal;
+  vertical-align: middle;
+}
+
+.hb-compare__corner {
+  width: 18rem;
+}
+
+.hb-compare thead .hb-compare__corner {
+  font-size: 1.2rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--hb-muted);
+}
+
+.hb-compare tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: rgb(var(--color-background));
+}
+
+.hb-compare__link {
+  display: grid;
+  gap: var(--hb-space-xs);
+  color: rgb(var(--color-foreground));
+  font-family: var(--font-heading-family);
+  font-size: 1.6rem;
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.hb-compare__link:hover span {
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+.hb-compare__image {
+  display: block;
+  width: 8rem;
+  height: 8rem;
+  object-fit: cover;
+  border-radius: calc(var(--hb-radius) - 0.2rem);
+  background: rgba(var(--color-foreground), 0.04);
+}
+
+.hb-compare__yes {
+  width: 1.8rem;
+  height: 1.8rem;
+  margin-right: 0.4rem;
+  vertical-align: -0.3rem;
+  color: rgb(var(--color-button));
+}

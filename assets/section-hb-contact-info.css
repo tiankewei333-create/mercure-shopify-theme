@@ -1,0 +1,51 @@
+.hb-contact__heading {
+  margin: 0 0 var(--hb-space-md);
+}
+
+.hb-contact {
+  display: grid;
+  gap: var(--hb-space-md);
+  margin: 0;
+}
+
+@media screen and (min-width: 750px) {
+  .hb-contact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.hb-contact__row {
+  display: grid;
+  gap: var(--hb-space-2xs);
+}
+
+.hb-contact__row dt {
+  display: flex;
+  gap: var(--hb-space-xs);
+  align-items: center;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--hb-muted);
+}
+
+.hb-contact__row dt .hb-icon {
+  width: 1.8rem;
+  height: 1.8rem;
+  color: rgb(var(--color-button));
+}
+
+.hb-contact__row dd {
+  margin: 0;
+  font-size: 1.6rem;
+  line-height: 1.5;
+}
+
+.hb-contact__row address {
+  font-style: normal;
+}
+
+.hb-contact__row a {
+  color: rgb(var(--color-foreground));
+  text-underline-offset: 0.3rem;
+}

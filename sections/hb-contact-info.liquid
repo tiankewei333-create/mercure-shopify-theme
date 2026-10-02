@@ -1,0 +1,128 @@
+{%- comment -%}
+  Contact details for the contact page: email, phone, opening hours, address.
+  Empty fields are left out; the section disappears on the storefront when all four are empty.
+{%- endcomment -%}
+{%- liquid
+  assign email = section.settings.email | strip
+  assign phone = section.settings.phone | strip
+  assign hours = section.settings.hours | strip
+  assign address = section.settings.address | strip
+-%}
+
+{%- if email != blank or phone != blank or hours != blank or address != blank -%}
+  {{ 'section-hb-contact-info.css' | asset_url | stylesheet_tag }}
+  {%- render 'hb-section-padding', section: section -%}
+
+  <div class="color-{{ section.settings.color_scheme }} gradient">
+    <div class="page-width page-width--narrow section-{{ section.id }}-padding">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="h2 hb-contact__heading">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+      <dl class="hb-contact">
+        {%- if email != blank -%}
+          <div class="hb-contact__row">
+            <dt>{%- render 'hb-icon', icon: 'mail' -%}{{ 'hb.contact.email' | t }}</dt>
+            <dd><a href="mailto:{{ email }}">{{ email | escape }}</a></dd>
+          </div>
+        {%- endif -%}
+        {%- if phone != blank -%}
+          <div class="hb-contact__row">
+            <dt>{%- render 'hb-icon', icon: 'phone' -%}{{ 'hb.contact.phone' | t }}</dt>
+            <dd><a href="tel:{{ phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' }}">{{ phone | escape }}</a></dd>
+          </div>
+        {%- endif -%}
+        {%- if hours != blank -%}
+          <div class="hb-contact__row">
+            <dt>{%- render 'hb-icon', icon: 'clock' -%}{{ 'hb.contact.hours' | t }}</dt>
+            <dd>{{ hours | escape | newline_to_br }}</dd>
+          </div>
+        {%- endif -%}
+        {%- if address != blank -%}
+          <div class="hb-contact__row">
+            <dt>{%- render 'hb-icon', icon: 'pin' -%}{{ 'hb.contact.address' | t }}</dt>
+            <dd>
+              <address>{{ address | escape | newline_to_br }}</address>
+            </dd>
+          </div>
+        {%- endif -%}
+      </dl>
+    </div>
+  </div>
+{%- elsif request.design_mode -%}
+  <div class="page-width">
+    <p class="hb-editor-hint">Contact details are hidden: fill in at least one field.</p>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Contact details",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Talk to a person"
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Email",
+      "default": "hello@hearthandbrew.example"
+    },
+    {
+      "type": "text",
+      "id": "phone",
+      "label": "Phone",
+      "info": "Shown as written; spaces and brackets are removed for the call link."
+    },
+    {
+      "type": "textarea",
+      "id": "hours",
+      "label": "Opening hours",
+      "default": "Monday to Friday, 9:00 to 17:00\nReplies within one working day"
+    },
+    {
+      "type": "textarea",
+      "id": "address",
+      "label": "Address"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contact details"
+    }
+  ]
+}
+{% endschema %}

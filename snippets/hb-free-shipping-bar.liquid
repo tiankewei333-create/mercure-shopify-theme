@@ -1,0 +1,47 @@
+{%- comment -%}
+  Progress toward free shipping. Lives inside markup that Dawn already re-renders through the
+  Section Rendering API (cart drawer inner, cart page subtotal), so it stays current without extra JS.
+
+  Hidden when: disabled in theme settings, threshold is 0 or empty, cart is empty, or the customer's
+  currency differs from the store currency (Liquid has no exchange rate, so the amount would be wrong).
+
+  Accepts:
+  - class: {String} optional modifier class
+{%- endcomment -%}
+{%- liquid
+  assign threshold = settings.hb_free_shipping_threshold | default: 0 | times: 100 | round
+  assign show_bar = false
+  if settings.hb_free_shipping_enabled and threshold > 0 and cart.item_count > 0 and cart.currency.iso_code == shop.currency
+    assign show_bar = true
+  endif
+-%}
+{%- if show_bar -%}
+  {%- liquid
+    assign remaining = threshold | minus: cart.total_price
+    assign remaining_money = remaining | money
+    assign percent = cart.total_price | times: 100 | divided_by: threshold
+    if percent > 100
+      assign percent = 100
+    endif
+  -%}
+  <div class="hb-shipping-bar{% if class != blank %} {{ class }}{% endif %}{% if remaining <= 0 %} hb-shipping-bar--done{% endif %}">
+    <p class="hb-shipping-bar__text">
+      {%- if remaining > 0 -%}
+        {{ 'hb.free_shipping.remaining_html' | t: amount: remaining_money }}
+      {%- else -%}
+        {%- render 'hb-icon', icon: 'truck' -%}
+        {{ 'hb.free_shipping.achieved' | t }}
+      {%- endif -%}
+    </p>
+    <div
+      class="hb-shipping-bar__track"
+      role="progressbar"
+      aria-label="{{ 'hb.free_shipping.progress_label' | t }}"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="{{ percent }}"
+    >
+      <span class="hb-shipping-bar__fill" style="width: {{ percent }}%"></span>
+    </div>
+  </div>
+{%- endif -%}

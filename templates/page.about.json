@@ -1,0 +1,79 @@
+{
+  "sections": {
+    "story": {
+      "type": "hb-story",
+      "blocks": {
+        "start": {
+          "type": "milestone",
+          "settings": {
+            "year": "2018",
+            "title": "A kitchen-table prototype",
+            "text": "<p>A gooseneck spout bent by hand, tested on a thousand mornings.</p>"
+          }
+        },
+        "dripper": {
+          "type": "milestone",
+          "settings": {
+            "year": "2020",
+            "title": "Our first ceramic dripper",
+            "text": "<p>Thrown with a small studio in Stoke-on-Trent, still made there today.</p>"
+          }
+        },
+        "workshop": {
+          "type": "milestone",
+          "settings": {
+            "year": "2024",
+            "title": "The workshop opens",
+            "text": "<p>Repairs, spare parts and brewing classes under one roof.</p>"
+          }
+        }
+      },
+      "block_order": ["start", "dripper", "workshop"],
+      "settings": {
+        "eyebrow": "Our story",
+        "heading": "We started with one kettle that poured badly.",
+        "text": "<p>Hearth & Brew began at a kitchen table in 2018. Every product is sketched, prototyped and brewed with in our own workshop before it reaches yours.</p>",
+        "color_scheme": "scheme-1",
+        "padding_top": 40,
+        "padding_bottom": 56
+      }
+    },
+    "values": {
+      "type": "hb-value-props",
+      "blocks": {
+        "repair": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "Built to be repaired",
+            "text": "<p>Spare parts for every product we have ever sold.</p>"
+          }
+        },
+        "materials": {
+          "type": "item",
+          "settings": {
+            "icon": "leaf",
+            "title": "Honest materials",
+            "text": "<p>Stainless steel, stoneware and walnut. No coatings that flake.</p>"
+          }
+        },
+        "tested": {
+          "type": "item",
+          "settings": {
+            "icon": "bean",
+            "title": "Tested on real brews",
+            "text": "<p>Every recipe on this site is one we drink ourselves.</p>"
+          }
+        }
+      },
+      "block_order": ["repair", "materials", "tested"],
+      "settings": {
+        "heading": "What we hold ourselves to",
+        "color_scheme": "scheme-2",
+        "padding_top": 52,
+        "padding_bottom": 52
+      }
+    }
+  },
+  "order": ["story", "values"]
+}

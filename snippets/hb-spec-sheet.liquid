@@ -1,0 +1,127 @@
+{%- comment -%}
+  Button + native <dialog> showing a spec_sheet metaobject as an accessible table.
+
+  The sheet comes from the block's `sheet` setting, which the product template connects to
+  product.metafields.custom.spec_sheet as a dynamic source. Products sharing a sheet reference the same entry.
+
+  Table format (spec_sheet.table, multi-line text):
+    first non-empty line = header row, one row per line, cells separated by |
+  Short rows are padded with an explicit "not specified" cell; extra cells are ignored.
+
+  Renders nothing when there is no sheet or no data rows.
+
+  Accepts:
+  - block: {Object}
+{%- endcomment -%}
+{%- liquid
+  assign sheet = block.settings.sheet
+  assign header_cells = ''
+  assign col_count = 0
+  assign row_count = 0
+
+  if sheet != blank
+    assign lines = sheet.table.value | newline_to_br | split: '<br />'
+  endif
+-%}
+
+{%- capture body_rows -%}
+  {%- for line in lines -%}
+    {%- assign row_text = line | strip -%}
+    {%- if row_text == blank -%}{%- continue -%}{%- endif -%}
+    {%- assign cells = row_text | split: '|' -%}
+
+    {%- if col_count == 0 -%}
+      {%- assign header_cells = cells -%}
+      {%- assign col_count = cells.size -%}
+      {%- continue -%}
+    {%- endif -%}
+
+    {%- assign row_count = row_count | plus: 1 -%}
+    <tr>
+      {%- for cell in cells limit: col_count -%}
+        {%- assign value = cell | strip -%}
+        {%- if forloop.first -%}
+          <th scope="row">{{ value | escape }}</th>
+        {%- elsif value == blank -%}
+          <td><span aria-hidden="true">—</span><span class="visually-hidden">{{ 'hb.spec_sheet.not_specified' | t }}</span></td>
+        {%- else -%}
+          <td>{{ value | escape }}</td>
+        {%- endif -%}
+      {%- endfor -%}
+      {%- assign missing = col_count | minus: cells.size -%}
+      {%- if missing > 0 -%}
+        {%- for i in (1..missing) -%}
+          <td><span aria-hidden="true">—</span><span class="visually-hidden">{{ 'hb.spec_sheet.not_specified' | t }}</span></td>
+        {%- endfor -%}
+      {%- endif -%}
+    </tr>
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- if row_count > 0 -%}
+  {%- liquid
+    assign default_label = 'hb.spec_sheet.default_button' | t
+    assign button_label = block.settings.button_label | default: default_label
+    assign title = sheet.title.value | default: button_label
+    assign title_id = 'SpecSheetTitle-' | append: block.id
+  -%}
+  <script src="{{ 'hb-modal.js' | asset_url }}" defer="defer"></script>
+
+  <hb-modal class="hb-spec-sheet" {{ block.shopify_attributes }}>
+    <button type="button" class="hb-spec-sheet__trigger link" data-hb-modal-open aria-haspopup="dialog">
+      {%- render 'hb-icon', icon: 'ruler' -%}
+      <span>{{ button_label | escape }}</span>
+    </button>
+
+    <dialog class="hb-modal color-{{ settings.cart_color_scheme }}" aria-labelledby="{{ title_id }}">
+      <div class="hb-modal__inner">
+        <div class="hb-modal__header">
+          <h2 id="{{ title_id }}" class="h3">{{ title | escape }}</h2>
+          <form method="dialog">
+            <button class="hb-modal__close" aria-label="{{ 'hb.spec_sheet.close' | t }}">
+              {%- render 'hb-icon', icon: 'close' -%}
+            </button>
+          </form>
+        </div>
+
+        <div class="hb-table-scroll" role="region" aria-labelledby="{{ title_id }}" tabindex="0">
+          <table class="hb-table">
+            <thead>
+              <tr>
+                {%- for cell in header_cells -%}
+                  <th scope="col">{{ cell | strip | escape }}</th>
+                {%- endfor -%}
+              </tr>
+            </thead>
+            <tbody>
+              {{- body_rows -}}
+            </tbody>
+          </table>
+        </div>
+
+        {%- if sheet.notes.value != blank -%}
+          <p class="hb-modal__notes">{{ sheet.notes.value | escape | newline_to_br }}</p>
+        {%- endif -%}
+
+        {%- if sheet.diagram.value != blank -%}
+          <div class="hb-modal__diagram">
+            {{-
+              sheet.diagram.value
+              | image_url: width: 1200
+              | image_tag:
+                loading: 'lazy',
+                widths: '400, 800, 1200',
+                sizes: '(min-width: 750px) 64rem, 90vw',
+                alt: title
+            -}}
+          </div>
+        {%- endif -%}
+      </div>
+    </dialog>
+  </hb-modal>
+{%- elsif request.design_mode -%}
+  <p class="hb-editor-hint" {{ block.shopify_attributes }}>
+    No spec sheet for this product. Pick one in the product's <strong>Spec sheet</strong> metafield (this block's
+    setting should be connected to it).
+  </p>
+{%- endif -%}

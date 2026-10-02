@@ -1,0 +1,43 @@
+.hb-props {
+  display: grid;
+  gap: var(--hb-space-md);
+  margin: 0;
+}
+
+@media screen and (min-width: 750px) {
+  .hb-props {
+    grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+    gap: var(--hb-space-lg);
+  }
+}
+
+.hb-props__item {
+  display: flex;
+  gap: var(--hb-space-sm);
+  align-items: flex-start;
+}
+
+.hb-props__icon {
+  flex: none;
+  width: 3.2rem;
+  height: 3.2rem;
+  color: rgb(var(--color-button));
+}
+
+.hb-props__copy {
+  display: grid;
+  gap: var(--hb-space-2xs);
+}
+
+.hb-props__title {
+  margin: 0;
+}
+
+.hb-props__text {
+  font-size: 1.5rem;
+  color: var(--hb-muted);
+}
+
+.hb-props__text > * {
+  margin: 0;
+}

@@ -1,0 +1,121 @@
+/* Product page blocks: highlights, spec sheet trigger + dialog. */
+
+.hb-highlights {
+  display: grid;
+  gap: var(--hb-space-xs);
+  margin: var(--hb-space-md) 0;
+}
+
+.hb-highlights__item {
+  display: flex;
+  gap: var(--hb-space-xs);
+  align-items: flex-start;
+  line-height: 1.5;
+}
+
+.hb-highlights__icon {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  margin-top: 0.1rem;
+  color: rgb(var(--color-button));
+}
+
+.hb-spec-sheet {
+  display: block;
+  margin: var(--hb-space-sm) 0;
+}
+
+hb-modal:not(:defined) .hb-spec-sheet__trigger {
+  visibility: hidden;
+}
+
+.hb-spec-sheet__trigger {
+  display: inline-flex;
+  gap: var(--hb-space-xs);
+  align-items: center;
+  min-height: 4.4rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: rgb(var(--color-foreground));
+  font: inherit;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.hb-spec-sheet__trigger .hb-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.hb-modal {
+  width: min(72rem, calc(100vw - 3.2rem));
+  max-height: calc(100dvh - 3.2rem);
+  padding: 0;
+  border: var(--hb-border);
+  border-radius: var(--hb-radius-lg);
+  background: rgb(var(--color-background));
+  color: rgb(var(--color-foreground));
+}
+
+.hb-modal::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.hb-modal__inner {
+  padding: var(--hb-space-md);
+}
+
+@media screen and (min-width: 750px) {
+  .hb-modal__inner {
+    padding: var(--hb-space-lg);
+  }
+}
+
+.hb-modal__header {
+  display: flex;
+  gap: var(--hb-space-md);
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--hb-space-md);
+}
+
+.hb-modal__header h2 {
+  margin: 0;
+}
+
+.hb-modal__close {
+  display: grid;
+  place-items: center;
+  width: 4.4rem;
+  height: 4.4rem;
+  margin: -1rem -1rem 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.hb-modal__close:hover {
+  background: rgba(var(--color-foreground), 0.06);
+}
+
+.hb-modal__notes {
+  margin: var(--hb-space-sm) 0 0;
+  font-size: 1.4rem;
+  color: var(--hb-muted);
+}
+
+.hb-modal__diagram {
+  margin-top: var(--hb-space-md);
+}
+
+.hb-modal__diagram img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--hb-radius);
+}

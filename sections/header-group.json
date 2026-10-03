@@ -17,10 +17,10 @@
         "announcement-bar-0": {
           "type": "announcement",
           "settings": {
-            "text": "Welcome to our store",
+            "text": "Free shipping on orders over $75 · 30-day returns",
             "text_alignment": "center",
             "color_scheme": "scheme-1",
-            "link": ""
+            "link": "shopify://collections/brewing"
           }
         }
       },

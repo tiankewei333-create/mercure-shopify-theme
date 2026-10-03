@@ -85,11 +85,12 @@
                 {%- for product in products -%}
                   {%- liquid
                     assign field = product.metafields.custom[key]
+                    # Check the type first: Liquid treats `false` as blank, so a "No" would read as missing.
                     assign is_empty = false
-                    if field == blank
-                      assign is_empty = true
-                    elsif field.type != 'boolean' and field.value == blank
-                      assign is_empty = true
+                    if field.type != 'boolean'
+                      if field == blank or field.value == blank
+                        assign is_empty = true
+                      endif
                     endif
                   -%}
                   <td>

@@ -1,0 +1,466 @@
+{%- comment -%}
+  Interactive 3D configurator: a Three.js model of the product the shopper can rotate and zoom, with
+  hotspots that fly the camera to a detail, and finish swatches that re-skin the model and select the
+  matching variant (kept in sync with the main product form in both directions).
+
+  The model is generated in code (src/hb-3d, bundled to hb-3d-scene.js) and only downloaded when the
+  section nears the viewport. The `model` setting is connected to product.metafields.custom.three_d_model,
+  so the section renders nothing for products without a 3D model.
+{%- endcomment -%}
+{%- liquid
+  assign model = section.settings.model | strip
+  assign current_variant = product.selected_or_first_available_variant
+  assign finish_blocks = section.blocks | where: 'type', 'finish'
+  assign hotspot_blocks = section.blocks | where: 'type', 'hotspot'
+  assign finish_index = -1
+  assign finish_option = null
+  for option in product.options_with_values
+    if option.name == section.settings.finish_option
+      assign finish_index = forloop.index0
+      assign finish_option = option
+    endif
+  endfor
+-%}
+
+{%- if product != blank and model == 'gooseneck_kettle' -%}
+  {{ 'section-hb-3d-configurator.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'hb-configurator.js' | asset_url }}" defer="defer"></script>
+  {%- render 'hb-section-padding', section: section -%}
+
+  {%- liquid
+    assign title_id = 'Configurator-' | append: section.id
+    assign hint_id = 'ConfiguratorHint-' | append: section.id
+    assign detail_id = 'ConfiguratorDetail-' | append: section.id
+  -%}
+
+  <div class="color-{{ section.settings.color_scheme }} gradient">
+    <hb-configurator
+      class="hb-configurator page-width section-{{ section.id }}-padding"
+      data-scene-url="{{ 'hb-3d-scene.js' | asset_url }}"
+      data-product-id="{{ product.id }}"
+      data-capacity="{{ product.metafields.custom.capacity_ml.value | default: 600 }}"
+      data-msg-loading="{{ 'hb.configurator.loading' | t }}"
+      data-msg-unsupported="{{ 'hb.configurator.unsupported' | t }}"
+      data-msg-pause="{{ 'hb.configurator.pause' | t }}"
+      data-msg-play="{{ 'hb.configurator.play' | t }}"
+      data-msg-add="{{ 'products.product.add_to_cart' | t }}"
+      data-msg-sold-out="{{ 'products.product.sold_out' | t }}"
+      data-msg-adding="{{ 'hb.configurator.adding' | t }}"
+      data-msg-added="{{ 'hb.configurator.added' | t }}"
+      data-msg-error="{{ 'hb.configurator.error' | t }}"
+    >
+      <header class="hb-section-header">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="hb-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+        <h2 id="{{ title_id }}" class="h2">{{ section.settings.heading | default: product.title | escape }}</h2>
+        {%- if section.settings.text != blank -%}
+          <div class="hb-section-header__text rte">{{ section.settings.text }}</div>
+        {%- endif -%}
+      </header>
+
+      <div class="hb-configurator__layout">
+        <div class="hb-configurator__stage" data-hb-stage data-state="idle">
+          <div class="hb-configurator__poster" aria-hidden="true">
+            {%- if product.featured_media -%}
+              {{-
+                product.featured_media
+                | image_url: width: 1400
+                | image_tag:
+                  loading: 'lazy',
+                  widths: '600, 900, 1200, 1400',
+                  sizes: '(min-width: 990px) 58vw, calc(100vw - 3rem)',
+                  alt: ''
+              -}}
+            {%- endif -%}
+          </div>
+
+          <div
+            class="hb-configurator__canvas"
+            data-hb-canvas
+            tabindex="0"
+            role="img"
+            aria-label="{{ 'hb.configurator.canvas_label' | t: title: product.title }}"
+            aria-describedby="{{ hint_id }}"
+          ></div>
+
+          <div class="hb-configurator__hotspots">
+            {%- for block in hotspot_blocks -%}
+              <button
+                type="button"
+                class="hb-hotspot"
+                data-hb-hotspot
+                data-hb-part-trigger
+                data-hb-requires-scene
+                data-part="{{ block.settings.part }}"
+                aria-pressed="false"
+                aria-controls="{{ detail_id }}"
+                hidden
+                {{ block.shopify_attributes }}
+              >
+                <span class="hb-hotspot__dot" aria-hidden="true"></span>
+                <span class="hb-hotspot__label">{{ block.settings.title | escape }}</span>
+              </button>
+            {%- endfor -%}
+          </div>
+
+          <p class="hb-configurator__status" role="status" data-hb-stage-status></p>
+
+          <p id="{{ hint_id }}" class="hb-configurator__hint" data-hb-requires-scene hidden>
+            {%- render 'hb-icon', icon: 'rotate' -%}
+            <span class="hb-configurator__hint-mouse">{{ 'hb.configurator.hint_mouse' | t }}</span>
+            <span class="hb-configurator__hint-touch">{{ 'hb.configurator.hint_touch' | t }}</span>
+          </p>
+
+          <div
+            class="hb-configurator__toolbar"
+            role="toolbar"
+            aria-label="{{ 'hb.configurator.toolbar' | t }}"
+            data-hb-requires-scene
+            hidden
+          >
+            <button type="button" class="hb-configurator__tool" data-hb-action="rotate" aria-pressed="true">
+              <span data-hb-icon-pause>{% render 'hb-icon', icon: 'pause' %}</span>
+              <span data-hb-icon-play hidden>{% render 'hb-icon', icon: 'play' %}</span>
+            </button>
+            <button
+              type="button"
+              class="hb-configurator__tool"
+              data-hb-action="explode"
+              aria-pressed="false"
+              aria-label="{{ 'hb.configurator.lift_lid' | t }}"
+            >
+              {%- render 'hb-icon', icon: 'lift' -%}
+            </button>
+            <button
+              type="button"
+              class="hb-configurator__tool"
+              data-hb-action="zoom-in"
+              aria-label="{{ 'hb.configurator.zoom_in' | t }}"
+            >
+              {%- render 'hb-icon', icon: 'plus' -%}
+            </button>
+            <button
+              type="button"
+              class="hb-configurator__tool"
+              data-hb-action="zoom-out"
+              aria-label="{{ 'hb.configurator.zoom_out' | t }}"
+            >
+              {%- render 'hb-icon', icon: 'minus' -%}
+            </button>
+            <button
+              type="button"
+              class="hb-configurator__tool"
+              data-hb-action="reset"
+              aria-label="{{ 'hb.configurator.reset' | t }}"
+            >
+              {%- render 'hb-icon', icon: 'reset' -%}
+            </button>
+          </div>
+        </div>
+
+        <div class="hb-configurator__panel">
+          <div class="hb-configurator__product">
+            <p class="hb-configurator__title h4">{{ product.title | escape }}</p>
+            <p class="hb-configurator__price" data-hb-price>{{ current_variant.price | money }}</p>
+          </div>
+
+          {%- if finish_option -%}
+            <fieldset class="hb-configurator__finishes">
+              <legend class="hb-configurator__label">
+                {{ finish_option.name | escape }}:
+                <span data-hb-finish-name>{{ finish_option.selected_value | escape }}</span>
+              </legend>
+              <div class="hb-configurator__swatches">
+                {%- for value in finish_option.values -%}
+                  {%- liquid
+                    assign swatch_color = 'rgba(var(--color-foreground), 0.12)'
+                    for block in finish_blocks
+                      if block.settings.option_value == value.name
+                        assign swatch_color = block.settings.body_color
+                      endif
+                    endfor
+                    assign input_id = 'Finish-' | append: section.id | append: '-' | append: forloop.index
+                  -%}
+                  <input
+                    type="radio"
+                    class="hb-configurator__swatch-input visually-hidden"
+                    id="{{ input_id }}"
+                    name="Finish-{{ section.id }}"
+                    value="{{ value.name | escape }}"
+                    data-hb-finish-input
+                    {% if value.selected %}
+                      checked
+                    {% endif %}
+                  >
+                  <label class="hb-configurator__swatch" for="{{ input_id }}" style="--hb-swatch: {{ swatch_color }};">
+                    <span class="hb-configurator__swatch-dot" aria-hidden="true"></span>
+                    {{ value.name | escape }}
+                  </label>
+                {%- endfor -%}
+              </div>
+            </fieldset>
+          {%- endif -%}
+
+          {%- for block in finish_blocks -%}
+            <span hidden data-finish-value="{{ block.settings.option_value | escape }}" {{ block.shopify_attributes }}></span>
+          {%- endfor -%}
+
+          {%- if hotspot_blocks.size > 0 -%}
+            <div class="hb-configurator__details">
+              <p class="hb-configurator__label">{{ 'hb.configurator.details' | t }}</p>
+              <ul class="hb-configurator__parts list-unstyled" role="list">
+                {%- for block in hotspot_blocks -%}
+                  <li>
+                    <button
+                      type="button"
+                      class="hb-configurator__part"
+                      data-hb-part-trigger
+                      data-part="{{ block.settings.part }}"
+                      aria-pressed="false"
+                      aria-controls="{{ detail_id }}"
+                    >
+                      {{ block.settings.title | escape }}
+                    </button>
+                  </li>
+                {%- endfor -%}
+              </ul>
+              <div aria-live="polite">
+                <div id="{{ detail_id }}" class="hb-configurator__detail" data-hb-detail hidden>
+                  <p class="hb-configurator__detail-title" data-hb-detail-title></p>
+                  <p class="hb-configurator__detail-text" data-hb-detail-text></p>
+                </div>
+              </div>
+            </div>
+          {%- endif -%}
+
+          <div class="hb-configurator__buy">
+            <button
+              type="button"
+              class="button button--full-width"
+              data-hb-action="add"
+              data-hb-add
+              {% unless current_variant.available %}
+                disabled
+              {% endunless %}
+            >
+              {%- if current_variant.available -%}
+                {{ 'products.product.add_to_cart' | t }}
+              {%- else -%}
+                {{ 'products.product.sold_out' | t }}
+              {%- endif -%}
+            </button>
+            <p class="hb-configurator__add-status" role="status" data-hb-add-status></p>
+          </div>
+        </div>
+      </div>
+
+      <script type="application/json" data-hb-config>
+        {
+          "selectedVariantId": {{ current_variant.id | json }},
+          "finishIndex": {{ finish_index }},
+          "finishOptionName": {{ section.settings.finish_option | json }},
+          "variants": [
+            {%- for variant in product.variants -%}
+              {
+                "id": {{ variant.id | json }},
+                "price": {{ variant.price | json }},
+                "available": {{ variant.available | json }},
+                "options": {{ variant.options | json }}
+              }{%- unless forloop.last -%},{%- endunless -%}
+            {%- endfor -%}
+          ],
+          "finishes": [
+            {%- for block in finish_blocks -%}
+              {
+                "value": {{ block.settings.option_value | json }},
+                "body": "{{ block.settings.body_color }}",
+                "surface": {{ block.settings.surface | json }},
+                "handle": "{{ block.settings.handle_color }}",
+                "knob": "{{ block.settings.knob_color }}"
+              }{%- unless forloop.last -%},{%- endunless -%}
+            {%- endfor -%}
+          ],
+          "hotspots": [
+            {%- for block in hotspot_blocks -%}
+              {
+                "part": {{ block.settings.part | json }},
+                "title": {{ block.settings.title | json }},
+                "text": {{ block.settings.text | json }}
+              }{%- unless forloop.last -%},{%- endunless -%}
+            {%- endfor -%}
+          ]
+        }
+      </script>
+    </hb-configurator>
+  </div>
+{%- elsif request.design_mode -%}
+  <div class="page-width">
+    <p class="hb-editor-hint">
+      "3D configurator" is hidden: this product has no 3D model. Set its <strong>3D model</strong> metafield to
+      <code>gooseneck_kettle</code>.
+    </p>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "3D configurator",
+  "tag": "section",
+  "class": "section",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "text",
+      "id": "model",
+      "label": "3D model",
+      "info": "Connect to the product's \"3D model\" metafield. Supported value: gooseneck_kettle. Hidden when empty."
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Make it yours"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "See every detail in 3D"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "text",
+      "id": "finish_option",
+      "label": "Finish option name",
+      "default": "Finish",
+      "info": "The product option whose values change the model's finish, e.g. Finish or Color."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "finish",
+      "name": "Finish",
+      "settings": [
+        {
+          "type": "text",
+          "id": "option_value",
+          "label": "Option value",
+          "info": "Must match the variant option value exactly, e.g. Matte black. The first finish is used when nothing matches."
+        },
+        {
+          "type": "color",
+          "id": "body_color",
+          "label": "Body color",
+          "default": "#1d1d1f"
+        },
+        {
+          "type": "select",
+          "id": "surface",
+          "label": "Surface",
+          "options": [
+            { "value": "matte", "label": "Matte powder coat" },
+            { "value": "satin", "label": "Brushed metal" },
+            { "value": "polished", "label": "Polished metal" },
+            { "value": "glazed", "label": "Glazed ceramic" }
+          ],
+          "default": "matte"
+        },
+        {
+          "type": "color",
+          "id": "handle_color",
+          "label": "Handle color",
+          "default": "#141414"
+        },
+        {
+          "type": "color",
+          "id": "knob_color",
+          "label": "Lid knob color",
+          "default": "#6b4a2f"
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "name": "Hotspot",
+      "settings": [
+        {
+          "type": "select",
+          "id": "part",
+          "label": "Part",
+          "options": [
+            { "value": "spout", "label": "Spout" },
+            { "value": "handle", "label": "Handle" },
+            { "value": "lid", "label": "Lid" },
+            { "value": "base", "label": "Base" }
+          ],
+          "default": "spout"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Detail"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "3D configurator",
+      "blocks": [
+        {
+          "type": "finish",
+          "settings": { "option_value": "Matte black", "body_color": "#1d1d1f", "surface": "matte" }
+        },
+        {
+          "type": "hotspot",
+          "settings": { "part": "spout", "title": "Tapered spout" }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

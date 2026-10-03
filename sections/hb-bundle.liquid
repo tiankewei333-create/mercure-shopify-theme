@@ -42,7 +42,7 @@
         {% endif %}
       >
       <label class="hb-bundle__media" for="{{ input_id }}">
-        <span class="visually-hidden">{{ 'hb.bundle.include' | t: title: add_on.title | escape }}</span>
+        <span class="visually-hidden">{{ 'hb.bundle.include' | t: title: add_on.title }}</span>
         {%- if add_on.featured_media -%}
           {{-
             add_on.featured_media
@@ -89,11 +89,11 @@
   <div class="color-{{ section.settings.color_scheme }} gradient">
     <hb-bundle
       class="hb-bundle page-width section-{{ section.id }}-padding"
-      data-msg-none="{{ 'hb.bundle.none_selected' | t | escape }}"
-      data-msg-error="{{ 'hb.bundle.error' | t | escape }}"
-      data-msg-added="{{ 'hb.bundle.added' | t | escape }}"
-      data-msg-adding="{{ 'hb.bundle.adding' | t | escape }}"
-      data-msg-sold-out="{{ 'hb.bundle.sold_out' | t | escape }}"
+      data-msg-none="{{ 'hb.bundle.none_selected' | t }}"
+      data-msg-error="{{ 'hb.bundle.error' | t }}"
+      data-msg-added="{{ 'hb.bundle.added' | t }}"
+      data-msg-adding="{{ 'hb.bundle.adding' | t }}"
+      data-msg-sold-out="{{ 'hb.bundle.sold_out' | t }}"
     >
       {%- if section.settings.heading != blank or section.settings.text != blank -%}
         <div class="hb-section-header">
@@ -124,7 +124,7 @@
                 {% endif %}
               >
               <label class="hb-bundle__media" for="{{ current_id }}">
-                <span class="visually-hidden">{{ 'hb.bundle.include' | t: title: product.title | escape }}</span>
+                <span class="visually-hidden">{{ 'hb.bundle.include' | t: title: product.title }}</span>
                 {%- if product.featured_media -%}
                   {{-
                     product.featured_media

@@ -60,6 +60,24 @@
     "story": {
       "fallback_alt": "Hand-thrown ceramic drippers and a kettle on a workshop bench",
       "timeline_label": "Our story timeline"
+    },
+    "configurator": {
+      "loading": "Loading 3D view…",
+      "unsupported": "The 3D view isn't available on this device.",
+      "canvas_label": "Interactive 3D model of {{ title }}. Use the arrow keys to rotate and + or - to zoom.",
+      "hint_mouse": "Drag to rotate · Ctrl + scroll to zoom",
+      "hint_touch": "Drag to rotate · Pinch to zoom",
+      "toolbar": "3D view controls",
+      "pause": "Pause rotation",
+      "play": "Start rotation",
+      "lift_lid": "Lift the lid",
+      "zoom_in": "Zoom in",
+      "zoom_out": "Zoom out",
+      "reset": "Reset view",
+      "details": "Take a closer look",
+      "adding": "Adding…",
+      "added": "Added to cart",
+      "error": "We couldn't add this to your cart. Please try again."
     }
   },
   "general": {

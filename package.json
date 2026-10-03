@@ -5,6 +5,7 @@
   "description": "Custom Online Store 2.0 theme for Hearth & Brew, built on Dawn",
   "scripts": {
     "dev": "shopify theme dev",
+    "build:3d": "esbuild src/hb-3d/scene.js --bundle --format=esm --minify --target=es2020 --legal-comments=eof --outfile=assets/hb-3d-scene.js",
     "check": "shopify theme check --fail-level error",
     "push:unpublished": "shopify theme push --unpublished",
     "redirects:woo": "node scripts/woo-redirects.mjs",
@@ -14,6 +15,8 @@
     "node": ">=20"
   },
   "devDependencies": {
-    "@shopify/cli": "^4.8.2"
+    "@shopify/cli": "^4.8.2",
+    "esbuild": "^0.28.2",
+    "three": "^0.186.1"
   }
 }

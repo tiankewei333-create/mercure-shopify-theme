@@ -1,0 +1,470 @@
+hb-configurator {
+  display: block;
+}
+
+.hb-configurator__layout {
+  display: grid;
+  gap: var(--hb-space-lg);
+}
+
+@media screen and (min-width: 990px) {
+  .hb-configurator__layout {
+    grid-template-columns: minmax(0, 1.55fr) minmax(30rem, 1fr);
+    align-items: center;
+  }
+}
+
+/* Stage: poster image until the scene is ready, then the WebGL canvas with overlays. */
+.hb-configurator__stage {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--hb-radius-lg);
+  background:
+    radial-gradient(120% 90% at 50% 35%, rgb(var(--color-background)) 0%, rgba(var(--color-foreground), 0.06) 100%);
+  isolation: isolate;
+}
+
+@media screen and (min-width: 750px) {
+  .hb-configurator__stage {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+.hb-configurator__poster {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.5s ease;
+}
+
+.hb-configurator__poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.hb-configurator__stage[data-state='ready'] .hb-configurator__poster {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hb-configurator__canvas {
+  position: absolute;
+  inset: 0;
+  cursor: grab;
+  touch-action: none;
+}
+
+.hb-configurator__canvas:active {
+  cursor: grabbing;
+}
+
+.hb-configurator__canvas:focus-visible {
+  outline-offset: -0.4rem;
+  box-shadow: none;
+}
+
+.hb-configurator__stage:not([data-state='ready']) .hb-configurator__canvas {
+  pointer-events: none;
+}
+
+.hb-configurator__gl {
+  display: block;
+  opacity: 0;
+  animation: hb-configurator-in 0.6s ease forwards;
+}
+
+@keyframes hb-configurator-in {
+  to {
+    opacity: 1;
+  }
+}
+
+.hb-configurator__status {
+  position: absolute;
+  inset: auto 0 50% 0;
+  margin: 0;
+  text-align: center;
+  font-size: 1.4rem;
+  color: var(--hb-muted);
+}
+
+.hb-configurator__status:empty {
+  display: none;
+}
+
+.hb-configurator__stage[data-state='loading'] .hb-configurator__status {
+  inset: auto 0 var(--hb-space-md) 0;
+}
+
+.hb-configurator__stage[data-state='unsupported'] .hb-configurator__status {
+  inset: auto var(--hb-space-md) var(--hb-space-md);
+  padding: var(--hb-space-xs) var(--hb-space-sm);
+  border-radius: var(--hb-radius);
+  background: rgb(var(--color-background));
+}
+
+/* Hotspots are positioned every frame by the scene via transform. */
+.hb-configurator__hotspots {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hb-hotspot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--hb-space-xs);
+  margin: -1.6rem 0 0 -1.6rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: rgb(var(--color-foreground));
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: opacity 0.25s ease;
+}
+
+.hb-hotspot[hidden] {
+  display: none;
+}
+
+.hb-hotspot__dot {
+  position: relative;
+  flex: none;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  background: rgba(var(--color-background), 0.92);
+  box-shadow: 0 0.2rem 1.2rem rgba(0, 0, 0, 0.18);
+}
+
+.hb-hotspot__dot::before,
+.hb-hotspot__dot::after {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 1.2rem;
+  height: 0.15rem;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+  transition: transform 0.25s ease;
+}
+
+.hb-hotspot__dot::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.hb-hotspot[aria-pressed='true'] .hb-hotspot__dot {
+  background: rgb(var(--color-button));
+  color: rgb(var(--color-button-text));
+}
+
+.hb-hotspot[aria-pressed='true'] .hb-hotspot__dot::after {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.hb-hotspot:not([aria-pressed='true']) .hb-hotspot__dot {
+  animation: hb-hotspot-pulse 2.4s ease-out infinite;
+}
+
+@keyframes hb-hotspot-pulse {
+  0% {
+    box-shadow: 0 0.2rem 1.2rem rgba(0, 0, 0, 0.18), 0 0 0 0 rgba(var(--color-background), 0.7);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0.2rem 1.2rem rgba(0, 0, 0, 0.18), 0 0 0 1.2rem rgba(var(--color-background), 0);
+  }
+}
+
+.hb-hotspot__label {
+  padding: 0.4rem 1rem;
+  border-radius: 99rem;
+  background: rgba(var(--color-background), 0.92);
+  box-shadow: 0 0.2rem 1.2rem rgba(0, 0, 0, 0.12);
+  font-size: 1.3rem;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-0.4rem);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.hb-hotspot:hover .hb-hotspot__label,
+.hb-hotspot:focus-visible .hb-hotspot__label,
+.hb-hotspot[aria-pressed='true'] .hb-hotspot__label {
+  opacity: 1;
+  transform: none;
+}
+
+.hb-hotspot.is-occluded {
+  opacity: 0.35;
+}
+
+.hb-hotspot.is-occluded:not(:focus-visible) .hb-hotspot__label {
+  opacity: 0;
+}
+
+/* Overlays */
+.hb-configurator__hint {
+  position: absolute;
+  top: var(--hb-space-md);
+  left: 50%;
+  display: flex;
+  gap: var(--hb-space-xs);
+  align-items: center;
+  margin: 0;
+  padding: 0.6rem 1.4rem;
+  border-radius: 99rem;
+  background: rgba(var(--color-background), 0.88);
+  font-size: 1.3rem;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.hb-configurator__hint[hidden] {
+  display: none;
+}
+
+.hb-configurator__hint .hb-icon {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+.hb-configurator__hint-touch {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .hb-configurator__hint-touch {
+    display: inline;
+  }
+
+  .hb-configurator__hint-mouse {
+    display: none;
+  }
+}
+
+.hb-configurator__stage.is-interacted .hb-configurator__hint {
+  opacity: 0;
+}
+
+.hb-configurator__toolbar {
+  position: absolute;
+  right: var(--hb-space-sm);
+  bottom: var(--hb-space-sm);
+  display: flex;
+  gap: 0.2rem;
+  padding: 0.4rem;
+  border-radius: 99rem;
+  background: rgba(var(--color-background), 0.92);
+  box-shadow: 0 0.2rem 1.6rem rgba(0, 0, 0, 0.12);
+}
+
+.hb-configurator__toolbar[hidden] {
+  display: none;
+}
+
+.hb-configurator__tool {
+  display: grid;
+  place-items: center;
+  width: 4.4rem;
+  height: 4.4rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: rgb(var(--color-foreground));
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.hb-configurator__tool:hover {
+  background: rgba(var(--color-foreground), 0.08);
+}
+
+.hb-configurator__tool[data-hb-action='explode'][aria-pressed='true'] {
+  background: rgb(var(--color-foreground));
+  color: rgb(var(--color-background));
+}
+
+.hb-configurator__tool .hb-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.hb-configurator__tool [hidden] {
+  display: none;
+}
+
+/* Panel */
+.hb-configurator__panel {
+  display: grid;
+  gap: var(--hb-space-md);
+}
+
+.hb-configurator__product {
+  display: grid;
+  gap: var(--hb-space-2xs);
+}
+
+.hb-configurator__title,
+.hb-configurator__price {
+  margin: 0;
+}
+
+.hb-configurator__price {
+  font-size: 1.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.hb-configurator__label {
+  margin: 0 0 var(--hb-space-xs);
+  padding: 0;
+  font-size: 1.4rem;
+  color: var(--hb-muted);
+}
+
+.hb-configurator__label span {
+  color: rgb(var(--color-foreground));
+}
+
+.hb-configurator__finishes {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.hb-configurator__swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hb-space-xs);
+}
+
+.hb-configurator__swatch {
+  display: inline-flex;
+  gap: var(--hb-space-xs);
+  align-items: center;
+  min-height: 4.4rem;
+  padding: 0.6rem 1.4rem 0.6rem 0.6rem;
+  border: var(--hb-border);
+  border-radius: 99rem;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hb-configurator__swatch-dot {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: var(--hb-swatch);
+  box-shadow: inset 0 0 0 0.1rem rgba(0, 0, 0, 0.12), inset 0 -0.6rem 1rem rgba(0, 0, 0, 0.12),
+    inset 0 0.4rem 0.8rem rgba(255, 255, 255, 0.25);
+}
+
+.hb-configurator__swatch-input:checked + .hb-configurator__swatch {
+  border-color: rgb(var(--color-foreground));
+  box-shadow: 0 0 0 0.1rem rgb(var(--color-foreground));
+}
+
+.hb-configurator__swatch-input:focus-visible + .hb-configurator__swatch {
+  outline: 0.2rem solid rgb(var(--color-foreground));
+  outline-offset: 0.3rem;
+}
+
+.hb-configurator__parts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hb-space-xs);
+  margin: 0;
+}
+
+.hb-configurator__part {
+  min-height: 4.4rem;
+  padding: 0 1.6rem;
+  border: var(--hb-border);
+  border-radius: 99rem;
+  background: none;
+  color: rgb(var(--color-foreground));
+  font: inherit;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.hb-configurator__part:hover {
+  border-color: rgba(var(--color-foreground), 0.4);
+}
+
+.hb-configurator__part[aria-pressed='true'] {
+  border-color: rgb(var(--color-foreground));
+  background: rgb(var(--color-foreground));
+  color: rgb(var(--color-background));
+}
+
+.hb-configurator__detail {
+  margin-top: var(--hb-space-sm);
+  padding: var(--hb-space-sm) var(--hb-space-md);
+  border-radius: var(--hb-radius);
+  background: rgba(var(--color-foreground), 0.04);
+}
+
+.hb-configurator__detail-title {
+  margin: 0 0 var(--hb-space-2xs);
+  font-weight: 600;
+}
+
+.hb-configurator__detail-text {
+  margin: 0;
+  font-size: 1.4rem;
+  line-height: 1.6;
+  color: var(--hb-muted);
+}
+
+.hb-configurator__buy {
+  display: grid;
+  gap: var(--hb-space-xs);
+}
+
+.hb-configurator__add-status {
+  min-height: 2rem;
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--hb-muted);
+}
+
+.hb-configurator__add-status--error {
+  color: rgb(var(--color-foreground));
+  font-weight: 600;
+}
+
+[data-hb-add][aria-disabled='true'] {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-configurator__poster,
+  .hb-hotspot,
+  .hb-hotspot__label,
+  .hb-configurator__hint {
+    transition: none;
+  }
+
+  .hb-configurator__gl {
+    opacity: 1;
+    animation: none;
+  }
+
+  .hb-hotspot__dot {
+    animation: none !important;
+  }
+}

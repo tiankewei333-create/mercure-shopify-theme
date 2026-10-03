@@ -1,3 +1,7 @@
+hb-bundle {
+  display: block;
+}
+
 .hb-bundle__form {
   display: grid;
   gap: var(--hb-space-lg);

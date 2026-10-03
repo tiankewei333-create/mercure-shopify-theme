@@ -80,6 +80,13 @@ const PRODUCT_METAFIELDS = [
   { key: 'capacity_ml', name: 'Capacity (ml)', type: 'number_integer' },
   { key: 'dishwasher_safe', name: 'Dishwasher safe', type: 'boolean' },
   { key: 'warranty_years', name: 'Warranty (years)', type: 'number_integer' },
+  {
+    key: 'three_d_model',
+    name: '3D model',
+    type: 'single_line_text_field',
+    description: 'Turns on the 3D configurator for this product.',
+    validations: [{ name: 'choices', value: JSON.stringify(['gooseneck_kettle']) }],
+  },
 ];
 
 async function gql(query, variables) {
@@ -118,8 +125,8 @@ async function ensureMetaobject(def) {
   return existing.metaobjectDefinitionByType.id;
 }
 
-async function ensureProductMetafield({ metaobject, ...def }, metaobjectIds) {
-  const validations = metaobject ? [{ name: 'metaobject_definition_id', value: metaobjectIds[metaobject] }] : [];
+async function ensureProductMetafield({ metaobject, validations: extra = [], ...def }, metaobjectIds) {
+  const validations = metaobject ? [{ name: 'metaobject_definition_id', value: metaobjectIds[metaobject] }] : extra;
   const data = await gql(
     `mutation ($definition: MetafieldDefinitionInput!) {
       metafieldDefinitionCreate(definition: $definition) {

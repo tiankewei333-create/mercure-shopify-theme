@@ -81,6 +81,92 @@
         "padding_bottom": 12
       }
     },
+    "configurator": {
+      "type": "hb-3d-configurator",
+      "blocks": {
+        "finish_black": {
+          "type": "finish",
+          "settings": {
+            "option_value": "Matte black",
+            "body_color": "#1d1d1f",
+            "surface": "matte",
+            "handle_color": "#141414",
+            "knob_color": "#6b4a2f"
+          }
+        },
+        "finish_steel": {
+          "type": "finish",
+          "settings": {
+            "option_value": "Brushed steel",
+            "body_color": "#c9ccd1",
+            "surface": "satin",
+            "handle_color": "#141414",
+            "knob_color": "#6b4a2f"
+          }
+        },
+        "finish_white": {
+          "type": "finish",
+          "settings": {
+            "option_value": "Stone white",
+            "body_color": "#ece8e1",
+            "surface": "matte",
+            "handle_color": "#8a6343",
+            "knob_color": "#8a6343"
+          }
+        },
+        "hotspot_spout": {
+          "type": "hotspot",
+          "settings": {
+            "part": "spout",
+            "title": "Tapered spout",
+            "text": "The gooseneck narrows to a 7 mm tip, so the stream stays thin and steady at 4–6 g per second, even when the kettle is full."
+          }
+        },
+        "hotspot_handle": {
+          "type": "hotspot",
+          "settings": {
+            "part": "handle",
+            "title": "Counterweighted handle",
+            "text": "Set back from the body so the kettle balances in your hand when full. It stays cool on the hob."
+          }
+        },
+        "hotspot_lid": {
+          "type": "hotspot",
+          "settings": {
+            "part": "lid",
+            "title": "Walnut knob lid",
+            "text": "Sits on a silicone ring, so it stays put when you tip the kettle all the way. The walnut knob never gets hot."
+          }
+        },
+        "hotspot_base": {
+          "type": "hotspot",
+          "settings": {
+            "part": "base",
+            "title": "Induction-ready base",
+            "text": "Magnetic stainless steel base that works on gas, electric and induction hobs."
+          }
+        }
+      },
+      "block_order": [
+        "finish_black",
+        "finish_steel",
+        "finish_white",
+        "hotspot_spout",
+        "hotspot_handle",
+        "hotspot_lid",
+        "hotspot_base"
+      ],
+      "settings": {
+        "model": "{{ product.metafields.custom.three_d_model.value }}",
+        "eyebrow": "Make it yours",
+        "heading": "See every detail in 3D",
+        "text": "<p>Drag to turn it around, tap a point to look closer, and pick the finish for your counter.</p>",
+        "finish_option": "Finish",
+        "color_scheme": "scheme-1",
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
+    },
     "bundle": {
       "type": "hb-bundle",
       "settings": {
@@ -146,6 +232,7 @@
   },
   "order": [
     "main",
+    "configurator",
     "bundle",
     "brew_guide",
     "faq",
